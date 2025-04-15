@@ -1,0 +1,94 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      phaseProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+type basicMultiphaseSystem;
+
+phases (solids gas);
+
+referencePhase gas;
+
+solids
+{
+    type            multicomponentPhaseModel;
+    residualAlpha   1e-8;
+    alphaMax        0.62;
+    diameterModel   constant;
+    constantCoeffs
+    {
+        d           ${${FOAM_CASE}/caseParamsDict!particleD};
+    }
+}
+
+gas
+{
+    type            multicomponentPhaseModel; // no reactions via chemistryModel
+    diameterModel   none;
+    residualAlpha   1e-8;
+}
+
+blending
+{
+    default
+    {
+        type            continuous;
+        residualAlpha   1e-8;
+        phase           gas;
+    }
+}
+
+interfaceCompression ();
+surfaceTension ();
+aspectRatio ();
+
+drag
+(
+
+    (solids in gas)
+    {
+        type            GidaspowErgunWenYu;//GidaspowSmooth;
+        residualAlpha   1e-7;
+        residualRe      1e-7;
+        swarmCorrection
+        {
+            type        none;
+        }
+    }
+);
+
+virtualMass ();
+
+heatTransfer
+(
+    (solids in gas)
+    {
+
+        type            Gunn;
+        residualAlpha   1e-6;
+
+    }
+);
+
+phaseTransfer {}
+lift ();
+wallLubrication ();
+turbulentDispersion ();
+
+// Minimum allowable pressure
+pMin            10000;
+
+
+// ************************************************************************* //

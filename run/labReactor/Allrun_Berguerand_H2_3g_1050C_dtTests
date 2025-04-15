@@ -1,0 +1,28 @@
+#!/bin/bash
+
+source "../../src/common/shellFunctions"
+
+runBerguerandCase () {
+    chemistry=$1
+    gas=$2
+    solidsMass=$3
+    T=$4
+    dt=$5
+    CASE_NAME=labReactor_${chemistry}_${gas}_${solidsMass}g_${T}C_dt${dt}
+    TK=$(bc <<< "scale=4; $T+273.15")
+    if [ ! -d "$CASE_NAME" ]; then
+        cp -r labReactor $CASE_NAME
+    else
+        echo "$CASE_NAME already exists"
+    fi
+    echo "./runCase $CASE_NAME --chemistry $chemistry --gas $gas "\
+         " --solidsMass 0.00$solidsMass --T $TK --nVolRate_mLn_min 900 "\
+         " --timeStep $dt --simTime 20  >/dev/null 2>&1 &"
+}
+
+# NOTE: dt=0.000025 case is the original labReactor_act_H2_3g_1050C
+
+for dt in 0.0002 0.0001 0.00005 0.0000125;
+do
+    runBerguerandCase act H2 3 1050 $dt
+done

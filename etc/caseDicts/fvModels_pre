@@ -1,0 +1,105 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      fvModels;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+HeterogeneousShrinkingCoreChemistryAbad
+{
+    type            HeterogeneousShrinkingCoreChemistry;
+    libs            ("libHeterogeneousChemistry.so");
+    // [-] oxygen carrying capacity
+    Ro              ${${FOAM_CASE}/constant/physicalProperties.solids!Ro};
+    gasPhaseName    gas;
+    solidPhaseName  solids;
+    inertsName      inerts;
+    oxidizedName    Fe2O3;
+    reducedName     FeO;
+
+    // Note that average stoichiometric coefficients b are put inside 
+    // pre-exponential factors and resulting factors are then downscaled to
+    // to get correct total conversion times, see Table 1 in the article.
+
+    reactions
+    {
+        Abad_H2
+        {
+            active      true;
+            reaction    "Fe2O3 + H2 = 2 FeO + H2O";
+            type        reactionRateControlled;
+
+            rg      0.5e-6;     // [m] grain radius
+            Ea      109.2e3;    // [J/mol] activation energy
+            n       1;          // [-] reaction order
+
+            // Recalculated values
+            A       4.57759992e-1; // [m/s] chemical kinetic constant (k0)
+            b       1;             // [mol/mol] legacy stoichiometric coeff
+        }
+
+        Abad_CO
+        {
+            active      true;
+            reaction    "Fe2O3 + CO = 2 FeO + CO2";
+            type        reactionRateControlled;
+
+            rg      0.5e-6;     // [m] grain radius
+            Ea      113.3e3;    // [J/mol] activation energy
+            n       1;          // [-] reaction order
+
+            // Recalculated values
+            A       1.88489408e-1; // [mol^(0.2)*m^(0.4)/s] chemical kinetic constant (k0)
+            b       1;             // [mol/mol] legacy stoichiometric coeff
+        }
+
+        Abad_CH4
+        {
+            active      true;
+            reaction    "4 Fe2O3 + CH4 = 8 FeO + CO2 + 2 H2O";
+            type        reactionRateControlled;
+
+            rg      0.5e-6;     // [m] grain radius
+            beta    0;          // [-] power of T multiplier. Set to zero
+            Ea      165.2e3;    // [J/mol] activation energy
+            n       1;          // [-] reaction order
+
+            // Recalculated values
+            A       7.86541637; // [m/s] chemical kinetic constant (k0)
+            b       4;          // [mol/mol] legacy stoichiometric coeff
+        }
+
+        Abad_O2
+        {
+            active      true;
+            reaction    "4 FeO + O2 = 2 Fe2O3";
+            type        reactionRateAndDiffusionControlled;
+
+            rg      0.48e-6;    // [m] grain radius
+            Ea      11.8e3;     // [J/mol] activation energy
+            n       1;          // [-] reaction order
+            Edif    77.4e3;     // [J/mol] activation energy 
+            rp      160e-6;     // [m] particle radius, used by diffusion controlled reactions
+            Xcrit   0.25;       // [-] Critical conversion at which mode switches from reaction rate controlled to diffusion controlled 
+
+            // Recalculated values
+            A       5.27350965e-5; // [m/s] chemical kinetic constant (k0)
+            De0     9.03088528e-6; // [m^2/s] pre-exponential factor
+            b       4;             // [mol/mol] legacy stoichiometric coeff
+        }
+    }
+}
+
+
+// ************************************************************************* //

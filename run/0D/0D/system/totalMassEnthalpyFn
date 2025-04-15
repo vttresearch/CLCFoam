@@ -1,0 +1,79 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+Description
+    Calculates total mass of a "solids" phase in the domain
+
+\*---------------------------------------------------------------------------*/
+
+libs            ( "libutilityFunctionObjects.so" );
+enabled         true;
+type            coded;
+name            totalMassEnthalpy;
+//writeControl    writeTime;
+executeControl  timeStep;
+
+codeOptions
+#{
+    -I$(LIB_SRC)/physicalProperties/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/multicomponentThermo/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/chemistryModel/lnInclude \
+#};
+
+codeLibs
+#{
+    -lphysicalProperties \
+    -lfluidThermophysicalModels \
+    -lspecie \
+    -lmulticomponentThermophysicalModels \
+    -lchemistryModel \
+#};
+
+codeInclude
+#{
+    #include "basicChemistryModel.H"
+#};
+
+codeExecute
+#{
+    // const basicChemistryModel& chemistryModel_= mesh().lookupObject<basicChemistryModel>( "chemistryProperties.gas" );
+    // label nSpecie = chemistryModel_.nSpecie();
+    // for (label si=0; si<nSpecie; si++)
+    // {
+    // 	Info << "RR[" << si << "] = " << chemistryModel_.calculateRR(0, si)()[0] << endl;
+    // }
+    // scalar Fe2O3g = mesh().lookupObject<volScalarField>("Fe2O3.gas")()[0];
+    // scalar Fe2O3s = mesh().lookupObject<volScalarField>("Fe2O3.solids")()[0];
+    // scalar FeOg = mesh().lookupObject<volScalarField>("FeO.gas")()[0];
+    // scalar FeOs = mesh().lookupObject<volScalarField>("FeO.solids")()[0];
+    // Info << "Fe2O3g Fe2O3s FeOg FeOs" << endl;
+    // Info << Fe2O3g << " " << Fe2O3s << " " << FeOg << " " << FeOs << endl;
+    const fluidMulticomponentThermo& gasThermo =
+        lookupObject<fluidMulticomponentThermo>(IOobject::groupName(physicalProperties::typeName,"gas"));
+    const fluidMulticomponentThermo& solidThermo =
+        lookupObject<fluidMulticomponentThermo>(IOobject::groupName(physicalProperties::typeName,"solids"));
+    const scalar V = mesh().V().average().value(); // [0] doesn't work
+    const scalar rho_g = gasThermo.rho()()[0];
+    const scalar rho_s = solidThermo.rho()()[0];
+    const scalar he_g = gasThermo.he()[0];
+    const scalar he_s = solidThermo.he()[0];
+    const volScalarField& Falpha_g = mesh().lookupObject<volScalarField>(IOobject::groupName("alpha", "gas"));
+    const volScalarField& Falpha_s = mesh().lookupObject<volScalarField>(IOobject::groupName("alpha", "solids"));
+    const scalar alpha_g = Falpha_g[0];
+    const scalar alpha_s = Falpha_s[0];
+    const scalar m_g = alpha_g*rho_g*V;
+    const scalar m_s = alpha_s*rho_s*V;
+    const scalar HE_g = m_g*he_g;
+    const scalar HE_s = m_s*he_s;
+    Info << "Parameter " << tab << "Gas phase    " << tab << "Solid phase    " << tab << "Total    " << nl;
+    Info << "Mass      " << tab << m_g << tab << m_s << tab << m_g+m_s << endl;
+    Info << "Energy (he)" << tab << HE_g << tab << HE_s << tab << HE_g+HE_s << endl;
+#};
+
+// ************************************************************************* //

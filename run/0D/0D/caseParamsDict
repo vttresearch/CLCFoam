@@ -1,0 +1,49 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version         2;
+    format          ascii;
+    class           dictionary;
+    location        "";
+    object          caseParamsDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// In this files all case parameters are set. Then some other variables are
+// derived in the caseDict file and imported by all other case files.
+
+// ------------=== Parameters to modify ===-------------
+
+gas                 H2;         // - name of the gas (H2,CO,CH4,O2)
+chemistry           pre;        // - name of the chemistry model (pre/act)
+simTime             2500;       // [s]  - simulation time
+timeStep            0.1;        // [s]  - time step
+L                   1;          // [m]  - domain size
+solidsMass          0.000050;   // [kg] - total mass of solids
+particleD           237e-6;     // [m]  - diameter of ilmenite particles
+initialConversion   1.0;        // [-]  - 0 - fully reduced, 1 - fully oxidized
+T                   1173;       // [K]  - temperature
+p                   101325;     // [Pa] - pressure
+
+// ------------=== Calculations with no external dependensies ===-------------
+
+#ifeq $chemistry pre
+    rhoOxidized         4100;       // [kg/m^3] - density of fully oxidized state
+    Ro                  0.04;       // [-]    - oxygen carrying capacity
+#endif
+#ifeq $chemistry act
+    rhoOxidized         4250;       // [kg/m^3] - density of fully oxidized state
+    Ro                  0.033;      // [-]    - oxygen carrying capacity
+#endif
+
+#ifeq $gas O2
+    initialConversion 0.0;
+#endif
+
+// ************************************************************************* //

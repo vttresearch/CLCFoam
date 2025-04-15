@@ -1,0 +1,40 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       IOobject;
+    location    "constant";
+    object      patchInteraction;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+patches
+(
+    wall
+    {
+        type rebound;
+        e    0.9;
+        mu   0.0;
+    }
+    inlet
+    {
+        type rebound;
+        e    0.9;
+        mu   0.0;
+    }
+    outlet
+    {
+        type escape;
+        e    0.9;
+        mu   0.0;
+    }
+
+);

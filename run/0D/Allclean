@@ -1,0 +1,5 @@
+#!/bin/bash
+cd ${0%/*} || exit 1    # Run from this directory
+
+rm -r 0D_*
+rm -r pre_H2.png pre_CO.png pre_CH4.png pre_O2.png act_H2.png act_CO.png act_CH4.png act_O2.png

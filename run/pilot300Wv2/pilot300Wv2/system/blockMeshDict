@@ -1,0 +1,89 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version 2.0;
+    format ascii;
+    class dictionary;
+    location system;
+    object blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+convertToMeters 1.0;
+
+//Corners of the initial box
+//The box has to be large enough to contain the geometry
+
+delta 0.01;
+
+x0 #calc "-0.045 - $delta";
+x1 #calc " 0.025 + $delta";
+y0 #calc "-0.0141 - $delta"; // lower a bit
+y1 #calc " 0.4399 + $delta";
+z0 #calc "-0.    - $delta";
+z1 #calc " 0.11  + $delta";
+
+kN 3;
+// Nx #calc "$kN * 7";
+// Ny #calc "$kN * 45";
+// Nz #calc "$kN * 11";
+// Nx #calc "$kN *  13";//0.03
+// Ny #calc "$kN * 51"; 
+// Nz #calc "$kN * 17";
+Nx #calc "$kN *  9";// 0.01
+Ny #calc "$kN * 47";
+Nz #calc "$kN * 13";
+
+#codeStream {
+    code
+    #{
+        Info << "dx = " << ($x1 - $x0) / $Nx << endl;
+        Info << "dy = " << ($y1 - $y0) / $Ny << endl;
+        Info << "dz = " << ($z1 - $z0) / $Nz << endl;
+    #};
+}
+
+vertices 
+(
+
+    ( $x0 $y0 $z0)
+    ( $x1 $y0 $z0)
+    ( $x1 $y1 $z0)
+    ( $x0 $y1 $z0)
+    ( $x0 $y0 $z1)
+    ( $x1 $y0 $z1)
+    ( $x1 $y1 $z1)
+    ( $x0 $y1 $z1)
+);
+
+blocks 
+(
+    //Amount of cells in the base mesh
+    //Snappy works best when the cells are uniform
+    // hex (0 1 2 3 4 5 6 7) (60 300 72) // working
+    // hex (0 1 2 3 4 5 6 7) (40 200 48)
+    hex (0 1 2 3 4 5 6 7) ($Nx $Ny $Nz)
+    // hex (0 1 2 3 4 5 6 7) (20 100 24)
+    simpleGrading (1 1 1)
+);
+
+edges ( );
+
+patches 
+(
+
+ wall ffminx ( (0 4 7 3) )
+ wall ffmaxx ( (1 2 6 5) )
+ wall ffminy ( (0 1 5 4) )
+ wall ffmaxy ( (3 7 6 2) )
+ wall ffminz ( (0 3 2 1) )
+ wall ffmaxz ( (4 5 6 7) )
+
+);
+mergePatchPairs ( );

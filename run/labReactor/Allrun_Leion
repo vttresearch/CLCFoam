@@ -1,0 +1,68 @@
+#!/bin/bash
+
+source "../../src/common/shellFunctions"
+
+prepareCase () {
+    chemistry=$1
+    gas=$2
+    defaultSpecie=$3
+    simTime=$4
+    T=$5 # in degree Celsius
+    CASE_NAME=labReactor_${chemistry}_${gas}_${T}C
+    TK=$(bc <<< "scale=4; $T+273.15")
+    if [ ! -d "$CASE_NAME" ]; then
+        cp -r labReactor $CASE_NAME
+    else
+        echo "$CASE_NAME already exists"
+    fi
+    if [ $gas == "O2" ]; then
+        nVolRate_mLn_min=1000
+    else
+        nVolRate_mLn_min=450
+    fi
+    echo "./runCase $CASE_NAME --chemistry $chemistry --gas $gas "\
+        "--defaultSpecie $defaultSpecie --simTime $simTime --T $TK "\
+        "--nVolRate_mLn_min $nVolRate_mLn_min  >/dev/null 2>&1 &"
+}
+
+# The setpoint of the thermocouple below the plate is 950 C -> 
+#   -> inlet temperature can be assumed to be 950 C
+# Temperature above the plate was reported:
+#       - 970 C for CH4
+#       - 975 C for syngas
+#       - 980 C for O2
+#   -> bed temperature can be assumed to be this value
+
+# NOTE THAT AFTER THE CORRECTION of fitted temperature THE HEAT RELEASE CHANGED!
+#      T     before   after
+# CH4  950     80.9   133.7    -> temperature reduction will be larger  (+40%?)
+# CO   950   - 60.8  - 47.6    -> temperature increase  will be smaller (-22%?)
+# H2   950   - 28.1  - 14.9    -> temperature increase  will be smaller (-47%?)
+# O2   950   -441.9  -468.3    -> temperature increase  will be larger  (+ 6%?)
+
+prepareCase pre CH4    H2O 200 950 # inlet temperature of 950
+prepareCase pre CH4    H2O 200 974 # to get the bed temperature of 970
+prepareCase act CH4    H2O  60 950 # inlet temperature of 950
+prepareCase act CH4    H2O  60 983 # to get the bed temperature of 970
+
+prepareCase pre syngas H2O 180 950 # inlet temperature of 950
+prepareCase pre syngas H2O 180 944 # to get the bed temperature of 975
+prepareCase act syngas H2O 120 950 # inlet temperature of 950
+prepareCase act syngas H2O 120 967 # to get the bed temperature of 975
+
+# not needed
+# prepareCase pre H2     H2O 150 950 # inlet temperature of 950
+# prepareCase act H2     H2O 130 950 # inlet temperature of 950
+# prepareCase act H2     H2O 130 946 # to get the bed temperature of 950
+
+# not needed
+# prepareCase pre CO     CO2 200 950
+# prepareCase act CO     CO2 140 950
+# prepareCase act CO     CO2 140 933
+
+prepareCase pre O2     N2  1200 950 # inlet temperature of 950
+prepareCase pre O2     N2  1200 968 # to get the bed temperature of 980
+prepareCase act O2     N2   600 950 # inlet temperature of 950
+prepareCase act O2     N2   600 957 # to get the bed temperature of 980
+
+# 12 cases

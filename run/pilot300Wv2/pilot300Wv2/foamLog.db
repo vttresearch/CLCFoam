@@ -1,0 +1,35 @@
+#------------------------------------------------------------------------------
+# Query database for Foam Log extraction.
+# Each line stands for one query:
+#
+#    name '/' line selector '/' column selector
+#
+# e.g.
+#    kMin/bounding k,/min:
+#
+# The extraction will select a line using 'bounding k,' and in the line
+# takes the word following 'min:' as the value.
+#
+# A special entry is the 'Separator' entry which delimits one iteration
+# from the other.
+#
+#------------------------------------------------------------------------------
+
+#- String to recognize new iteration by (usually same as 'Time')
+separator/^[ \t]*Time = /Time =
+executionTime/ExecutionTime = /ExecutionTime =
+
+#- Outlet gas concentrations
+outlet_AR_Y_N2/^[ \t]*average\(outlet_AR\) of CO2\.gas/CO2.gas =
+outlet_AR_Y_O2/^[ \t]*average\(outlet_AR\) of O2\.gas/O2.gas =
+outlet_AR_Y_CO2/^[ \t]*average\(outlet_AR\) of CO2\.gas/CO2.gas =
+outlet_AR_Y_AR/^[ \t]*average\(outlet_AR\) of AR\.gas/AR.gas =
+
+outlet_FR_Y_N2/^[ \t]*average\(outlet_FR\) of CO2\.gas/CO2.gas =
+outlet_FR_Y_O2/^[ \t]*average\(outlet_FR\) of O2\.gas/O2.gas =
+outlet_FR_Y_CO2/^[ \t]*average\(outlet_FR\) of CO2\.gas/CO2.gas =
+outlet_FR_Y_AR/^[ \t]*average\(outlet_FR\) of AR\.gas/AR.gas =
+
+#- Mass flows
+controlSurface_SL_AR/^[ \t]*sum\(inlet\) of alphaRhoPhi\.gas/alphaRhoPhi.gas =
+outlet_alphaRhoPhigas/^[ \t]*sum\(outlet\) of alphaRhoPhi\.gas/alphaRhoPhi.gas =

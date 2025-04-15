@@ -1,0 +1,33 @@
+// Conversion of a dictionary of mass fractions to list of mass fractions of gaseous species
+//
+// Inputs:
+//  INPUT_gasMassFractionsDictToList    - current conversion state (0 - fully reduced, 1 - fully oxidized)
+//
+// Outputs:
+//  OUTPUT_gasMassFractionsDictToList   - list of mass fractions, correspodning to species in constant/physicalProperties.gas
+//
+// Dependencies:
+//  constant/physicalProperties.gas
+
+OUTPUT_gasMassFractionsDictToList #codeStream   // Output
+{
+    codeInclude
+    #{
+        #include "calcFunctions.H"
+    #};
+
+    codeOptions
+    #{
+        -I$(FOAM_CASE)/../../../src/common/
+    #};
+
+    code
+    #{
+        os << dictToMassFractionsList(
+            // const wordList& species = dict.lookupScoped<wordList>(getEnv("FOAM_CASE") + "/constant/physicalProperties.gas!species", true, false),
+            $<wordList>{${FOAM_CASE}/constant/physicalProperties.gas!species},
+            $<dictionary>INPUT_gasMassFractionsDictToList // Input
+        );
+            // dict.subDict("INPUT_CALC_Ydict")
+    #};
+};

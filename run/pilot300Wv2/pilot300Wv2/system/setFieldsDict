@@ -1,0 +1,86 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      setFieldsDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+
+solidsMass      ${${FOAM_CASE}/caseParamsDict!solidsMass};
+solidsDensity   ${${FOAM_CASE}/caseDict!rho_solids_initial};
+setName         solids_loading;
+
+alphaSolids #codeStream
+{
+    codeInclude
+    #{
+        #include "volFields.H"
+        #include "cellSet.H"
+
+        using namespace Foam;
+    #};
+    codeOptions
+    #{
+        -I$(LIB_SRC)/finiteVolume/lnInclude \
+        -I$(LIB_SRC)/meshTools/lnInclude
+    #};
+    codeLibs
+    #{
+        -lmeshTools \
+        -lfiniteVolume
+    #};
+    code
+    #{
+        const IOdictionary& d = static_cast<const IOdictionary&>(dict);
+        const fvMesh& mesh = refCast<const fvMesh>(d.db());
+        const word setName = $<word>setName;
+        const cellSet myset(mesh(), setName, IOobject::MUST_READ);
+        scalar setVolume = 0;
+
+        forAllConstIter(labelHashSet, myset, iter) {
+            const label celli = iter.key();
+            scalar cellVolume = mesh.V()[celli];
+            setVolume += cellVolume;
+        }
+        reduce(setVolume, sumOp<scalar>());
+        Info << "Volume of the set is " << setVolume << endl;
+        const scalar solidsMass    = $solidsMass;
+        const scalar solidsDensity = $solidsDensity;
+        const scalar volumeFraction = (solidsMass/solidsDensity)/setVolume;
+        Info << "Volume fraction of solids is " << volumeFraction << endl;
+        os << volumeFraction;
+    #};
+};
+
+defaultFieldValues
+(
+
+    volScalarFieldValue alpha.solids 0.0
+    volScalarFieldValue alpha.gas 1.0
+
+);
+
+regions
+(
+    zoneToCell {
+        zone $setName;
+        fieldValues (
+            volScalarFieldValue alpha.solids $alphaSolids
+            volScalarFieldValue alpha.gas #calc "1.0-$alphaSolids"
+        );
+    }
+);
+
+
+// ************************************************************************* //

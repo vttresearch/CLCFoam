@@ -1,0 +1,7 @@
+HeterogeneousShrinkingCoreReaction.C
+HeterogeneousShrinkingCoreChemistry.C
+
+HeterogeneousShrinkingCoreReactions/HSCRReactionRateControlled.C
+HeterogeneousShrinkingCoreReactions/HSCRAbadReactionRateAndDiffusionControlled.C
+
+LIB = $(FOAM_USER_LIBBIN)/libHeterogeneousChemistry

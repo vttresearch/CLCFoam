@@ -1,0 +1,31 @@
+#!/bin/bash
+
+mkdir figures
+
+p0d='run/0D/plots/'
+plabr='run/labReactor/plots/'
+ppilot='run/pilot300Wv2/plots/'
+pres='figures/'
+
+cp "${p0d}Abad2011_fig5_pre.pdf"                     "${pres}Figure_05a.pdf"
+cp "${p0d}Abad2011_fig5_act.pdf"                     "${pres}Figure_05b.pdf"
+
+cp "${plabr}labReactor_results_Leion2008_CH4.pdf"    "${pres}Figure_06a.pdf"
+cp "${plabr}labReactor_results_Leion2008_syngas.pdf" "${pres}Figure_06b.pdf"
+cp "${plabr}labReactor_results_Leion2010_3g_H2.pdf"  "${pres}Figure_07a.pdf"
+cp "${plabr}labReactor_results_Leion2010_3g_CO.pdf"  "${pres}Figure_07b.pdf"
+cp "${plabr}labReactor_results_dT_vs_T.pdf"          "${pres}Figure_08a.pdf"
+cp "${plabr}labReactor_results_t_vs_T2.pdf"          "${pres}Figure_08b.pdf"
+
+cp "${ppilot}pilot300W_fields.png"                   "${pres}Figure_09.png"
+cp "${ppilot}pilot300W_oxidation.pdf"                "${pres}Figure_10.pdf"
+cp "${ppilot}pilot300W_outlet_species.pdf"           "${pres}Figure_11.pdf"
+cp "${ppilot}pilot300W_temperature.pdf"              "${pres}Figure_12a.pdf"
+cp "${ppilot}pilot300W_heat.pdf"                     "${pres}Figure_12b.pdf"
+
+cp "${plabr}labReactor_sensitivity_time_step_T_vs_t.pdf"         "${pres}Figure_B1a.pdf"
+cp "${plabr}labReactor_sensitivity_time_step_gamma_vs_omega.pdf" "${pres}Figure_B1b.pdf"
+cp "${plabr}labReactor_sensitivity_mesh_T_vs_t.pdf"              "${pres}Figure_B2a.pdf"
+cp "${plabr}labReactor_sensitivity_mesh_gamma_vs_omega.pdf"      "${pres}Figure_B2b.pdf"
+cp "${plabr}labReactor_sensitivity_density_bed_height_vs_t.pdf"  "${pres}Figure_B3a.pdf"
+cp "${plabr}labReactor_sensitivity_density_gamma_vs_omega.pdf"   "${pres}Figure_B3b.pdf"

@@ -1,0 +1,56 @@
+#!/bin/bash
+cd ${0%/*} || exit 1    # Run from this directory
+export LC_NUMERIC="en_US.UTF-8" # fixes printf complaining that I use . instead of , as decimal separator
+
+source "../../src/common/shellFunctions"
+
+chemistries=(pre act)
+gases=(CH4 H2 CO O2)
+cases_simTime=(2500 300)
+
+printf "%-6s %-8s %-8s %-8s     %-6s %-8s %-8s %-8s %-8s \n" "Case" "Y_Fe2O3" "Y_FeO" "Y_inerts" "Gas" "Y_sp" "Y_H2O"  "Y_CO2" "Y_N2"
+for chemistryi in {0..1}; do
+    chemistry=${chemistries[$chemistryi]}
+    simTime=${cases_simTime[$chemistryi]}
+    for gasi in {0..3}; do
+        gas=${gases[$gasi]}
+        folder_name=0D_${chemistry}_${gas}
+        cp -r 0D $folder_name
+        cd $folder_name
+
+            setParameter gas $gas
+            setParameter chemistry $chemistry
+            setParameter simTime $simTime
+
+            blockMesh >/dev/null 2>&1
+
+            setICBC
+
+            Y_Fe2O3=$(getEntry internalField 0/Fe2O3.solids)
+            Y_FeO=$(getEntry internalField 0/FeO.solids)
+            Y_inerts=$(getEntry internalField 0/inerts.solids)
+
+            Y=$(getEntry internalField 0/$gas.gas)
+            Y_H2O=$(getEntry internalField 0/H2O.gas)
+            Y_CO2=$(getEntry internalField 0/CO2.gas)
+            Y_N2=$(getEntry internalField 0/N2.gas)
+
+            printf "%-6s %8.6f %8.6f %8.6f     %-6s %8.6f %8.6f %8.6f %8.6f \n" "$chemistry" "$Y_Fe2O3" "$Y_FeO" "$Y_inerts" "$gas" "$Y" "$Y_H2O" "$Y_CO2" "$Y_N2"
+
+            foamDictionary -expand caseDict > caseDictExpanded
+            foamRun -solver multiphaseEuler &> log.foamRun &
+        cd ..
+    done
+done
+wait
+printf "%-20s %-10s %-10s %-10s %-10s %-10s %-10s\n" "Case" "Exp. time" "Sim. time" "L0" "L1" "L2" "dQ, kJ/mol O"
+for chemistryi in {0..1}; do
+    chemistry=${chemistries[$chemistryi]}
+    for gasi in {0..3}; do
+        gas=${gases[$gasi]}
+        cd 0D_${chemistry}_${gas}          
+            python PP.py
+            cp pp.png ../${chemistry}_${gas}.png
+        cd ..
+    done
+done

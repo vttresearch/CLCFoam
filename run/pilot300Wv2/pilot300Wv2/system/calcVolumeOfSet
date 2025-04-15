@@ -1,0 +1,45 @@
+calcVolumeOfSet
+{
+    libs        ("libutilityFunctionObjects.so");
+
+    type coded;
+
+    codeInclude
+    #{
+        #include "cellSet.H"
+    #};
+
+    codeWrite
+    #{
+        // Lookup U
+        // const volVectorField& U = mesh().lookupObject<volVectorField>("U");
+        // Write
+        // mag(U)().write();
+
+
+        // MeshZones<cellZone, polyMesh>
+        // auto set = mesh().cellZones();
+        const cellSet myset(mesh(), "solids_loading", IOobject::MUST_READ);
+        // cellSet myset(mesh(), "fluidization_downcomer", IOobject::MUST_READ);
+        // forAll(myset, celli) {
+        //     Info << myset.nFaces() << endl;
+        // }
+        scalar volume = 0;
+
+        forAllConstIter(labelHashSet, myset, iter) {
+            //  Info << iter << endl;
+            label faceI = iter.key();
+
+            // Get the cell index
+            label cellI = mesh().faceOwner()[faceI];
+
+            // Get the volume of the cell
+            scalar cellVolume = mesh().V()[cellI];
+
+            volume += cellVolume;
+        }
+
+        Info << volume << endl;
+        
+    #};
+}

@@ -1,0 +1,44 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       volScalarField;
+    location    "0";
+    object      alpha.solids.orig;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 0 0 0 0 0 0];
+
+internalField   uniform 0;
+boundaryField
+{
+    inlet
+    {
+        type            fixedValue;
+        // type            totalFlowRateAdvectiveDiffusive;
+        // phi             phi.solids;
+        // rho             rho.solids;
+        // massFluxFraction 0;
+        value           uniform 0;
+    }
+    outlet
+    {
+        // type            zeroGradient;
+        type            fixedValue;
+        value           uniform 0;
+    }
+    wall
+    {
+        type            zeroGradient;
+    }
+}
+
+
+// ************************************************************************* //

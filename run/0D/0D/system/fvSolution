@@ -1,0 +1,184 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+
+    "alpha.*"
+    {
+        nAlphaCorr      1;
+        nAlphaSubCycles 1;
+        implicitPhasePressure on;
+
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+        splitPhaseFlux    true;
+        meanFluxReference true;
+        dgdtLimit       1e-12;
+
+        tolerance       1e-10;
+        relTol          0;
+        minIter         1;
+        extremaCoeff    1;
+				implicitPhasePressure on;
+        //extremaCoeff  0.001;
+    }
+
+
+
+    p_rgh
+    {
+        solver          GAMG;
+        smoother        DIC;
+        processorAgglomerator procFaces;
+        nAgglomeratingCells 400;
+
+        tolerance       1e-8;
+        relTol          0.01;
+        minIter         1;
+        maxIter         50;
+    }
+
+    p_rghFinal
+    {
+        $p_rgh;
+        relTol          0;
+    }
+
+    "U.*"
+    {
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+
+        tolerance       1e-07;
+        relTol          0;
+        minIter         1;
+    }
+
+    "(h|e).*"
+    {
+        //solver          GAMG;
+        //smoother        DILUGaussSeidel;
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+        tolerance       1e-8;
+        relTol          0.0;
+        minIter         1;
+        maxIter         10;
+    }
+
+    "Theta.*"
+    {
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+
+        tolerance       1e-6;
+        relTol          0;
+        minIter         1;
+    }
+
+    "d.*"
+    {
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+
+        tolerance       1e-6;
+        relTol          0;
+        minIter         1;
+    }
+
+    "(k|epsilon).*"
+    {
+        //solver          GAMG;
+        //smoother        DILUGaussSeidel;
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+
+        tolerance       1e-07;
+        relTol          0;
+        minIter         1;
+    }
+
+    "Yi.*"
+    {
+        //solver          GAMG;
+        //smoother        DILUGaussSeidel;
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+
+        residualAlpha   1e-6;
+        tolerance       1e-07;
+        relTol          0.0;
+        minIter         1;
+    }
+
+    "R.*"
+    {
+        solver          GAMG;
+        smoother        symGaussSeidel;
+
+        tolerance       1e-08;
+        relTol          0.0;
+        minIter         1;
+    }
+
+    "Ii.*|G.*"
+    {
+        solver                GAMG;
+        smoother              symGaussSeidel;
+        processorAgglomerator procFaces;
+        nAgglomeratingCells   400;
+
+        tolerance             1e-10;
+        relTol                0.;
+        minIter               1;
+        maxIter               5;
+    }
+
+    yPsi
+    {
+        solver              GAMG;
+        smoother            symGaussSeidel;
+
+        tolerance           1e-12;
+        relTol              0;
+        maxIter             10;
+    }
+}
+
+PIMPLE
+{
+    nOuterCorrectors         5;    // Amount of outer corrections
+    nCorrectors              1;    // Amount of inner corrections
+    nNonOrthogonalCorrectors 1;    // Amount of non-orthogonal corrections
+    nEnergyCorrectors        1;    // Amount of energy equation solves  // DOESNT SOLVE ENERGY EQ
+
+    // rDeltaTSmoothingCoeff    0.05;  // Affects time field smoothing
+
+    faceMomentum no; //
+}
+
+relaxationFactors
+{
+    equations
+    {
+        ".*"                 1.0;
+    }
+}
+
+
+// ************************************************************************* //

@@ -1,0 +1,6 @@
+#!/bin/bash
+
+rm 0/alpha.solids 0/alpha.gas
+
+blockMesh >log.blockMesh 2>&1
+topoSet -dict system/topoSetSetsDict >log.topoSet 2>&1 # only for fvModel_mock

@@ -1,0 +1,96 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      binary;
+    class       volVectorField;
+    location    "0";
+    object      U.gas;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+VM  ${${FOAM_CASE}/caseDict!VM_NTP};
+
+dimensions      [0 1 -1 0 0 0 0];
+
+internalField   uniform (0 0 0);
+
+boundaryField
+{
+    wall
+    {
+        type            noSlip;
+    }
+    inlet_FR
+    {
+        type            interstitialNormalMassFlow;
+        alpha           alpha.gas;
+        rho             rho.gas;
+        Vn              ${${FOAM_CASE}/caseDict!inlet_FR};  // [Ln/min] - volumetric flow at NTP
+        rhon            ${${FOAM_CASE}/caseDict!rho_FR};   // [kg/m^3] - gas density at NTP
+        W               ${${FOAM_CASE}/caseDict!W_FR};      // [kg/m^3] - gas molar weight
+        massFlow        #calc " ( $Vn / 1000.0 / 60.0 ) / $VM * ( $W / 1000 )"; // [kg/s]
+        value           uniform (0 0 0);
+    }
+    inlet_AR
+    {
+        type            interstitialNormalMassFlow;
+        alpha           alpha.gas;
+        rho             rho.gas;
+        Vn              ${${FOAM_CASE}/caseDict!inlet_AR};  // [Ln/min] - volumetric flow at NTP
+        rhon            ${${FOAM_CASE}/caseDict!rho_AR};   // [kg/m^3] - gas density at NTP
+        W               ${${FOAM_CASE}/caseDict!W_AR};      // [kg/m^3] - gas molar weight
+        massFlow        #calc " ( $Vn / 1000.0 / 60.0 ) / $VM * ( $W / 1000 )"; // [kg/s]
+        value           uniform (0 0 0);
+    }
+    inlet_SL
+    {
+        type            interstitialNormalMassFlow;
+        alpha           alpha.gas;
+        rho             rho.gas;
+        Vn              ${${FOAM_CASE}/caseDict!inlet_SL};  // [Ln/min] - volumetric flow at NTP
+        rhon            ${${FOAM_CASE}/caseDict!rho_SL};   // [kg/m^3] - gas density at NTP
+        W               ${${FOAM_CASE}/caseDict!W_SL};      // [kg/m^3] - gas molar weight
+        massFlow        #calc " ( $Vn / 1000.0 / 60.0 ) / $VM * ( $W / 1000 )"; // [kg/s]
+        value           uniform (0 0 0);
+    }
+    inlet_DC2
+    {
+        type            interstitialNormalMassFlow;
+        alpha           alpha.gas;
+        rho             rho.gas;
+        Vn              ${${FOAM_CASE}/caseDict!inlet_DC2}; // [Ln/min] - volumetric flow at NTP
+        rhon            ${${FOAM_CASE}/caseDict!rho_DC2};  // [kg/m^3] - gas density at NTP
+        W               ${${FOAM_CASE}/caseDict!W_DC2};     // [kg/m^3] - gas molar weight
+        massFlow        #calc " ( $Vn / 1000.0 / 60.0 ) / $VM * ( $W / 1000 )"; // [kg/s]
+        value           uniform (0 0 0);
+    }
+    outlet_AR
+    {
+        type            pressureInletOutletVelocity;
+        phi             phi.gas;
+        value           uniform (0 0 0);
+    }
+    outlet_FR
+    {
+        type            pressureInletOutletVelocity;
+        phi             phi.gas;
+        value           uniform (0 0 0);
+    }
+}
+
+sources
+{
+    massSource_DC1
+    {
+        type            uniformFixedValue;
+        uniformValue    (0 1.0 0);
+    }
+}
+
+// ************************************************************************* //

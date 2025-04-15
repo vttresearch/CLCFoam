@@ -1,0 +1,78 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      setFieldsDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+m       ${${FOAM_CASE}/caseDict!solidsMass};  // [kg]  - mass of solids
+ICvol   ${${FOAM_CASE}/caseDict!ICvol};       // [m^3] - volume of the solids zone
+rho     ${${FOAM_CASE}/caseDict!rho_solids};  // [kg/m^3] - density of solids // TODO: check if density of oxidized
+
+// Does not work
+// ICvol #codeStream
+// {
+//     codeInclude
+//     #{
+//         #include "fvMesh.H"
+//         #include "cellSet.H"
+//     #};
+
+//     codeOptions
+//     #{
+//         -I$(LIB_SRC)/finiteVolume/lnInclude \
+//         -I$(LIB_SRC)/meshTools/lnInclude
+//     #};
+
+//     codeLibs
+//     #{
+//         -lmeshTools \
+//         -lfiniteVolume
+//     #};
+
+//     code
+//     #{
+//         const IOdictionary& d = static_cast<const IOdictionary&>
+//         (
+//             dict.parent().parent()
+//         );
+//         const fvMesh& mesh = refCast<const fvMesh>(d.db());
+//         const cellSet myset(mesh, "solids_loading", IOobject::MUST_READ);
+//         scalar volume = 0;
+//         forAllConstIter(labelHashSet, myset, iter) {
+//             label cellI = iter.key();
+//             scalar cellVolume = mesh.V()[cellI];
+//             volume += cellVolume;
+//         }
+//         os << volume;
+//     #};
+// };
+
+defaultFieldValues
+(
+    volScalarFieldValue alpha.solids 0.0
+);
+
+regions
+(
+    boxToCell {
+        box ( -0.012 -0.000001 -0.012  ) ( 0.012 0.040001 0.012 ) ;
+        fieldValues (
+            volScalarFieldValue alpha.solids #calc " $m / $ICvol / $rho "
+            volScalarFieldValue alpha.gas #calc " 1 - ( $m / $ICvol / $rho ) "
+        );
+    }
+);
+
+
+// ************************************************************************* //

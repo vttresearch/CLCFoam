@@ -1,0 +1,41 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+Description
+    Writes out values of fields from cells nearest to specified locations.
+
+\*---------------------------------------------------------------------------*/
+
+// Writing every time step
+
+x_AR   -0.0325;
+x_FR    0.0125;
+x_DC   -0.008;
+
+z       0.0125; // middle
+
+points  (
+  ($x_AR 0.015 $z) // AR0
+  ($x_AR 0.050 $z) // AR1
+  ($x_AR 0.090 $z) // AR2
+  ($x_AR 0.130 $z) // AR3
+  ($x_AR 0.190 $z) // AR4
+
+  ($x_FR 0.015 $z) // FR0 - closed
+  ($x_FR 0.050 $z) // FR1
+  ($x_FR 0.090 $z) // FR2
+  ($x_FR 0.130 $z) // FR3
+  ($x_FR 0.190 $z) // FR4
+
+  ($x_DC 0.060 $z) // DC
+);
+
+fields  ( p );
+
+#includeEtc "caseDicts/postProcessing/probes/probes.cfg"
+
+// ************************************************************************* //

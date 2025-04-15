@@ -1,0 +1,163 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version         2;
+    format          ascii;
+    class           dictionary;
+    location        "system";
+    object          controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+libs (
+    "libInterstitialInletBCs.so"
+    "libCLCFluidMulticomponentThermophysicalTransportModels.so"
+);
+
+application     foamRun;
+
+solver          multiphaseEuler;
+
+startFrom       latestTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         200;
+
+deltaT          1e-05;
+
+writeControl    adjustableRunTime;
+
+writeInterval   10;
+
+purgeWrite      0;
+
+writeFormat     binary;
+
+writePrecision  10;
+
+writeCompression uncompressed;
+
+timeFormat      general;
+
+timePrecision   9;
+
+runTimeModifiable on;
+
+adjustTimeStep  yes;
+
+maxCo           0.5;
+
+maxDeltaT       0.0002;
+
+functions
+{
+    // It might also make sense to add NRR for all cellSets
+
+    #includeFunc moleFractions(phase=gas)
+    #includeFunc frequentWriteFn
+    // #includeFunc volIntegrateAlphaSolidsFn // Total volume of solids [m^3] - should be constant
+    #includeFunc volIntegrate(writeInterval=100,fields=(alpha.solids))
+    // #includeFunc totalMassOfSolidsFn
+    #includeFunc pressureProbesFn
+    
+    // Heat flux through all walls
+    #includeFunc wallHeatFlux(phase=gas)
+
+    // Interpolate fields to be able to sample over internal faces (can be executed the same time as surface function, but just to be safe)
+    #includeFunc surfaceInterpolate(writeControl=none,executeControl=timeStep,executeInterval=1,field=O2.gas)
+    #includeFunc surfaceInterpolate(writeControl=none,executeControl=timeStep,executeInterval=1,field=CO.gas)
+    #includeFunc surfaceInterpolate(writeControl=none,executeControl=timeStep,executeInterval=1,field=CO2.gas)
+    #includeFunc surfaceInterpolate(writeControl=none,executeControl=timeStep,executeInterval=1,field=H2O.gas)
+    #includeFunc surfaceInterpolate(writeControl=none,executeControl=timeStep,executeInterval=1,field=H2.gas)
+    #includeFunc surfaceInterpolate(writeControl=none,executeControl=timeStep,executeInterval=1,field=CH4.gas)
+    #includeFunc surfaceInterpolate(writeControl=none,executeControl=timeStep,executeInterval=1,field=N2.gas)
+    #includeFunc surfaceInterpolate(writeControl=none,executeControl=timeStep,executeInterval=1,field=Ar.gas)
+    #includeFunc surfaceInterpolate(writeControl=none,executeControl=timeStep,executeInterval=1,field=Fe2O3.solids)
+    #includeFunc surfaceInterpolate(writeControl=none,executeControl=timeStep,executeInterval=1,field=FeO.solids)
+    #includeFunc surfaceInterpolate(writeControl=none,executeControl=timeStep,executeInterval=1,field=inerts.solids)
+    #includeFunc surfaceInterpolate(writeControl=none,executeControl=timeStep,executeInterval=1,field=h.gas)
+    #includeFunc surfaceInterpolate(writeControl=none,executeControl=timeStep,executeInterval=1,field=h.solids)
+
+    // Mass flow rates [kg/s]
+    #includeFunc patchFlowRate(writeInterval=100,fields=(alphaRhoPhi.gas),patch=inlet_AR)
+    #includeFunc patchFlowRate(writeInterval=100,fields=(alphaRhoPhi.gas),patch=inlet_FR)
+    #includeFunc patchFlowRate(writeInterval=100,fields=(alphaRhoPhi.gas),patch=inlet_SL)
+    #includeFunc patchFlowRate(writeInterval=100,fields=(alphaRhoPhi.gas),patch=inlet_DC2)
+    #includeFunc patchFlowRate(writeInterval=100,fields=(alphaRhoPhi.gas),patch=outlet_AR)
+    #includeFunc patchFlowRate(writeInterval=100,fields=(alphaRhoPhi.gas),patch=outlet_FR)
+    #includeFunc faceZoneFlowRate(writeInterval=100,fields=(alphaRhoPhi.solids alphaRhoPhi.gas),faceZone=controlSurface_SL_AR)
+    #includeFunc faceZoneFlowRate(writeInterval=100,fields=(alphaRhoPhi.solids alphaRhoPhi.gas),faceZone=controlSurface_SL_FR)
+    #includeFunc faceZoneFlowRate(writeInterval=100,fields=(alphaRhoPhi.solids alphaRhoPhi.gas),faceZone=controlSurface_DC_AR)
+    #includeFunc faceZoneFlowRate(writeInterval=100,fields=(alphaRhoPhi.solids alphaRhoPhi.gas),faceZone=controlSurface_DC_FR)
+
+    // Enthalpy fluxes [J/s]
+    #includeFunc patchFlowRate(writeInterval=100,fields=(alphaRhoPhi.gas),weightFields=(h.gas),patch=inlet_AR)
+    #includeFunc patchFlowRate(writeInterval=100,fields=(alphaRhoPhi.gas),weightFields=(h.gas),patch=inlet_FR)
+    #includeFunc patchFlowRate(writeInterval=100,fields=(alphaRhoPhi.gas),weightFields=(h.gas),patch=inlet_SL)
+    #includeFunc patchFlowRate(writeInterval=100,fields=(alphaRhoPhi.gas),weightFields=(h.gas),patch=inlet_DC2)
+    #includeFunc patchFlowRate(writeInterval=100,fields=(alphaRhoPhi.gas),weightFields=(h.gas),patch=outlet_AR)
+    #includeFunc patchFlowRate(writeInterval=100,fields=(alphaRhoPhi.gas),weightFields=(h.gas),patch=outlet_FR)
+    #includeFunc faceZoneFlowRate(writeInterval=100,fields=(alphaRhoPhi.gas),weightFields=(surfaceInterpolate(h.gas)),faceZone=controlSurface_SL_AR)
+    #includeFunc faceZoneFlowRate(writeInterval=100,fields=(alphaRhoPhi.gas),weightFields=(surfaceInterpolate(h.gas)),faceZone=controlSurface_SL_FR)
+    #includeFunc faceZoneFlowRate(writeInterval=100,fields=(alphaRhoPhi.gas),weightFields=(surfaceInterpolate(h.gas)),faceZone=controlSurface_DC_AR)
+    #includeFunc faceZoneFlowRate(writeInterval=100,fields=(alphaRhoPhi.gas),weightFields=(surfaceInterpolate(h.gas)),faceZone=controlSurface_DC_FR)
+    #includeFunc faceZoneFlowRate(writeInterval=100,fields=(alphaRhoPhi.solids),weightFields=(surfaceInterpolate(h.solids)),faceZone=controlSurface_SL_AR)
+    #includeFunc faceZoneFlowRate(writeInterval=100,fields=(alphaRhoPhi.solids),weightFields=(surfaceInterpolate(h.solids)),faceZone=controlSurface_SL_FR)
+    #includeFunc faceZoneFlowRate(writeInterval=100,fields=(alphaRhoPhi.solids),weightFields=(surfaceInterpolate(h.solids)),faceZone=controlSurface_DC_AR)
+    #includeFunc faceZoneFlowRate(writeInterval=100,fields=(alphaRhoPhi.solids),weightFields=(surfaceInterpolate(h.solids)),faceZone=controlSurface_DC_FR)
+
+    // Specie mass flow rates [kg/s]
+    #includeFunc surfaceSumSpecieFluxesPatchFn(patch=inlet_AR)
+    #includeFunc surfaceSumSpecieFluxesPatchFn(patch=inlet_FR)
+    #includeFunc surfaceSumSpecieFluxesPatchFn(patch=inlet_SL)
+    #includeFunc surfaceSumSpecieFluxesPatchFn(patch=inlet_DC2)
+    #includeFunc surfaceSumSpecieFluxesPatchFn(patch=outlet_AR)
+    #includeFunc surfaceSumSpecieFluxesPatchFn(patch=outlet_FR)
+    // MISTAKE IN THE APPLICATION OF THE ORIENTED SUM: FIELD MUST BE FLUX
+    // #includeFunc surfaceSumSpecieFluxesFaceZoneFn(faceZone=controlSurface_SL_AR)
+    // #includeFunc surfaceSumSpecieFluxesFaceZoneFn(faceZone=controlSurface_SL_FR)
+    // #includeFunc surfaceSumSpecieFluxesFaceZoneFn(faceZone=controlSurface_DC_AR)
+    // #includeFunc surfaceSumSpecieFluxesFaceZoneFn(faceZone=controlSurface_DC_FR)
+    // #includeFunc surfaceSumSolidSpecieFluxesFaceZoneFn(faceZone=controlSurface_SL_AR)
+    // #includeFunc surfaceSumSolidSpecieFluxesFaceZoneFn(faceZone=controlSurface_SL_FR)
+    // #includeFunc surfaceSumSolidSpecieFluxesFaceZoneFn(faceZone=controlSurface_DC_AR)
+    // #includeFunc surfaceSumSolidSpecieFluxesFaceZoneFn(faceZone=controlSurface_DC_FR)
+
+    // Total mass of solids in control volumes [m^3]
+    #includeFunc volIntegrate(writeInterval=100,fields=(rho.solids),weightField=alpha.solids)
+    #includeFunc volIntegrate(writeInterval=100,select=cellSet,cellSet=controlVolume_SL,fields=(rho.solids),weightField=alpha.solids)
+    #includeFunc volIntegrate(writeInterval=100,select=cellSet,cellSet=controlVolume_DC,fields=(rho.solids),weightField=alpha.solids)
+    #includeFunc volIntegrate(writeInterval=100,select=cellSet,cellSet=controlVolume_AR,fields=(rho.solids),weightField=alpha.solids)
+    #includeFunc volIntegrate(writeInterval=100,select=cellSet,cellSet=controlVolume_FR,fields=(rho.solids),weightField=alpha.solids)
+    #includeFunc volIntegrateSolidSpeciesFn
+    #includeFunc volIntegrateSolidSpeciesFn(select=cellSet,cellSet=controlVolume_SL)
+    #includeFunc volIntegrateSolidSpeciesFn(select=cellSet,cellSet=controlVolume_DC)
+    #includeFunc volIntegrateSolidSpeciesFn(select=cellSet,cellSet=controlVolume_AR)
+    #includeFunc volIntegrateSolidSpeciesFn(select=cellSet,cellSet=controlVolume_FR)
+
+    // Total reaction rates (solid specie consumption rates) [mol/s]
+    #includeFunc volIntegrate(writeInterval=100,fields=(NRR_Abad_H2))
+    #includeFunc volIntegrate(writeInterval=100,fields=(NRR_Abad_CO))
+    #includeFunc volIntegrate(writeInterval=100,fields=(NRR_Abad_CH4))
+    #includeFunc volIntegrate(writeInterval=100,fields=(NRR_Abad_O2))
+
+    // An estimate of solids temperature (since only energy can be averaged, not T)
+    #includeFunc volAverage(writeInterval=100,weightFields=(rho.solids alpha.solids),fields=(T.solids))
+    #includeFunc volAverage(writeInterval=100,select=cellSet,cellSet=controlVolume_SL,weightFields=(rho.solids alpha.solids),fields=(T.solids))
+    #includeFunc volAverage(writeInterval=100,select=cellSet,cellSet=controlVolume_DC,weightFields=(rho.solids alpha.solids),fields=(T.solids))
+    #includeFunc volAverage(writeInterval=100,select=cellSet,cellSet=controlVolume_AR,weightFields=(rho.solids alpha.solids),fields=(T.solids))
+    #includeFunc volAverage(writeInterval=100,select=cellSet,cellSet=controlVolume_FR,weightFields=(rho.solids alpha.solids),fields=(T.solids))
+    
+}
+
+
+// ************************************************************************* //

@@ -1,0 +1,71 @@
+# ---=== Elsevier ===---
+# Fonts:
+#   - Arial (or Helvetica) (in sans-serif)
+#   - Courier
+#   - Symbol (not available in mpl)
+#   - Times (or Times New Roman)
+# Sizes (if 4:3):
+#   - minimal:  30 mm (1.1811 inch). Height  22.5 mm (0.8858 inch)
+#   - 1   col:  90 mm (3.5433 inch). Height  67.5 mm (2.6575 inch)
+#   - 1.5 col: 140 mm (5.5118 inch). Height 105   mm (4.1339 inch)
+#   - 2   col: 190 mm (7.4803 inch). Height 142.5 mm (5.6102 inch)
+# Line weight: 1 pt (see FAQ)
+# Sources: https://www.elsevier.com/about/policies-and-standards/author/artwork-and-media-instructions?trial=true
+# ---=== Other hints ===---
+# For cm, see: https://stackoverflow.com/questions/43714059/matplotlib-how-to-access-internal-cm-font
+# cmfont = font_manager.FontProperties(fname=mpl.get_data_path() + '/fonts/ttf/cmr10.ttf')
+# mpl.rcParams['font.serif']=cmfont.get_name()
+# List all fonts: 
+# import matplotlib.font_manager
+# mpl.font_manager.get_font_names()
+# ------------------------------------------------------------------------------
+
+# NOTE: from fonts below any can be selected
+
+font.family: sans-serif # similar, too edgy
+# font.sans-serif: Arial
+#font.sans-serif: Helvetica
+
+# font.family: monospace # old-school
+# font.monospace: Courier
+
+######### !!!!!!!!!!!!!!!!! This needs to be applied to ofgate: https://stackoverflow.com/a/49884009
+# font.family: serif
+# font.serif: Times # not available on my system
+# font.serif: Times New Roman
+
+# mathtext.fontset: cm # not sure if this is allowed, but it looks nicer
+
+font.size: 9
+figure.figsize: 3.5433, 2.6575
+lines.linewidth: 1.0
+
+axes.unicode_minus: True
+# https://davidmathlogic.com/colorblind/#%23000000-%23E69F00-%2356B4E9-%23009E73-%23F0E442-%230072B2-%23D55E00-%23CC79A7
+# Wong color palette
+# 000000-E69F00-56B4E9-009E73-F0E442-0072B2-D55E00-CC79A7
+axes.prop_cycle: cycler('color',['0072B2', 'E69F00', '009E73', 'CC79A7', 'D55E00', 'k']) # + cycler('ls',['-', '--', ':', '-.', (0,(3,5,1,5,1,5))])
+# axes.prop_cycle : cycler(color='bgrcmyk')
+
+
+legend.frameon: False
+axes.linewidth: 0.5
+grid.linewidth: 0.5
+
+# Set x axis
+xtick.direction : in
+xtick.major.size : 3
+xtick.major.width : 0.5
+xtick.minor.size : 1.5
+xtick.minor.width : 0.5
+xtick.minor.visible : True
+xtick.top : True
+
+# Set y axis
+ytick.direction : in
+ytick.major.size : 3
+ytick.major.width : 0.5
+ytick.minor.size : 1.5
+ytick.minor.width : 0.5
+ytick.minor.visible : True
+ytick.right : True

@@ -1,0 +1,39 @@
+#!/bin/bash
+# Note that this script DOES NOT modify parameters, not explicitly given as arguments
+# Usage: 
+# runCase labReactor_act_CH4 --chemistry act --gas CH4
+
+source "../../src/common/shellFunctions"
+
+POSITIONAL_ARGS=()
+CASE_PATH=$1
+
+
+pushd $CASE_PATH  
+    while [[ $# -gt 0 ]]; do
+    case $1 in
+        --*)
+            # TODO: fix when arg contains hyphen
+            parameter="${1//-}"
+            value="${2//-}"
+            if foamDictionary -expand -entry $parameter caseParamsDict ; then
+                setParameter $parameter $value
+            else
+                echo "Parameter $parameter not found!"
+                exit 1
+            fi
+            shift
+            shift
+            ;;
+        *)
+            POSITIONAL_ARGS+=("$1") # save positional arg
+            shift # past argument
+            ;;
+    esac
+    done
+
+    set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
+
+  
+    ./Allrun
+popd

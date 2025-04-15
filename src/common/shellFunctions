@@ -1,0 +1,66 @@
+#!/bin/bash
+
+getEntry () {
+    entry=$1
+    dict=$2
+    foamDictionary -expand $dict >/dev/null 2>&1
+    foamDictionary -expand -entry $entry -value $dict | tail -n1 | sed "s/uniform //g"
+}
+
+setEntry () { # TODO: try to make non-invasive, using sed (I have the code somewhere in old repos)
+    entry=$1
+    value=$2
+    dict=$3
+    # foamDictionary -expand -entry $entry -set $value $dict >/dev/null 2>&1
+    sed -i "0,/$entry /{s/$entry .*/$entry $value;/}" $dict
+}
+
+getParameter () {
+    getEntry $1 caseParamsDict
+}
+
+setParameter () {
+    echo "setEntry $1 $2 caseParamsDict"
+    setEntry "$1" "$2" caseParamsDict
+}
+
+setICBC () {
+    if [ -d 0.orig ]; then
+        phases=$(getEntry phases constant/phaseProperties | sed "s/(//g" | sed "s/)//g") # one way to convert OF list to array
+        rm -rf 0 >/dev/null 2>&1
+        cp -r 0.orig 0
+        for phase in $phases; do
+            species=$(getEntry species constant/physicalProperties.$phase)
+            if [ ! -z "$species" ]; then
+                printf "\033[0;32mSetting ICBC fields for phase $phase for species $species\033[0m\n"
+                species=( ${species:1:-1} ) # alternative way to convert OF list to array
+                for sp in "${species[@]}"; do
+                    cp 0/Y.$phase.template 0/$sp.$phase
+                    foamDictionary -entry FoamFile/object 0/$sp.$phase -set "$sp.$phase" >/dev/null 2>&1
+                done
+            else
+                printf "\033[0;33mWarning! Skipping phase $phase, because species were not found in constant/physicalProperties.$phase!\033[0m\n"
+            fi
+        done
+        rm 0/Y.*.template
+    else
+        >&2 echo "[$0] Error in setICBC: directory 0.orig not found!"
+    fi
+}
+
+setScalars () {
+    phases=$(getEntry phases constant/phaseProperties | sed "s/(//g" | sed "s/)//g") # one way to convert OF list to array
+    numberOfPoints=$(grep "#includeModel scalarSourceFvm" constant/fvModels | wc -l)
+    for phase in $phases; do
+        if [ -f "0/s.$phase.template" ]; then
+            printf "\033[0;32mSetting scalar fields for phase $phase\033[0m\n"
+            for ((i=1 ; i<=$numberOfPoints; i++)); do
+                filename=s$i.$phase
+                cp 0/s.$phase.template 0/$filename
+                foamDictionary -entry FoamFile/object 0/$filename -set $filename >/dev/null 2>&1
+            done
+        else
+            printf "\033[0;33mWarning! Skipping phase $phase, because file 0/s.$phase.template was not found!\033[0m\n"
+        fi
+    done
+}

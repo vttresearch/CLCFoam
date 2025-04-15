@@ -1,0 +1,123 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version         2;
+    format          ascii;
+    class           dictionary;
+    location        "system";
+    object          controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+libs            ("libCLCFluidMulticomponentThermophysicalTransportModels.so");
+
+application     foamRun;
+
+solver          multiphaseEuler;
+
+startFrom       latestTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         ${${FOAM_CASE}/caseParamsDict!simTime};
+
+deltaT          ${${FOAM_CASE}/caseParamsDict!timeStep};
+
+writeControl    runTime;
+
+writeInterval   1;
+
+purgeWrite      0;
+
+writeFormat     binary;
+
+writePrecision  12;
+
+writeCompression uncompressed;
+
+timeFormat      general;
+
+timePrecision   8;
+
+runTimeModifiable yes;
+
+adjustTimeStep  no;
+
+maxCo           0.5;
+
+maxDeltaT       0.0001;
+
+// DebugSwitches
+// {
+//     totalFlowRateAdvectiveDiffusive 1; 
+// }
+
+functions
+{
+    // #includeFunc moleFractions(phase=gas)
+    // #includeFunc frequentWriteFn(writeInterval=0.1)
+    #includeFunc writeObjects(objects=(rho.gas))
+
+    // Heat flux through all walls
+    // #includeFunc wallHeatFlux(phase=gas, writeControl=timeStep, writeInterval=100, objects=())
+
+    // Temperature probe as in Leion et al. 2008 [K]
+    #includeFunc probes(points=((0 0.01 0)), fields=(T.gas), writeControl=timeStep, writeInterval=100)
+
+    // Pressure profile [Pa]
+    #includeFunc graphUniform(start=(0 0 0), end=(0 0.16 0), fields=(p_rgh alpha.solids), axis=y, nPoints=101)
+
+    // Specie's mass fractions at exit [-]
+    #includeFunc surfaceAverageSpecieFluxesPatchFn(patch=outlet)
+
+    // Specie's mass fluxes [kg/s]
+    #includeFunc surfaceSumSpecieFluxesPatchFn(patch=inlet)
+    #includeFunc surfaceSumSpecieFluxesPatchFn(patch=outlet)
+    #includeFunc surfaceSumSolidSpecieFluxesPatchFn(patch=inlet)
+    #includeFunc surfaceSumSolidSpecieFluxesPatchFn(patch=outlet)
+
+    // Total mass of solids [kg]
+    #includeFunc volIntegrateFn(fields=(rho.solids),weightField=alpha.solids)
+
+    // Total mass of gas [kg]
+    #includeFunc volIntegrateFn(fields=(rho.gas),weightField=alpha.gas)
+    
+    // Total mass of solid fractions [kg]
+    #includeFunc volIntegrateSolidSpeciesFn(weightFields=(alpha.solids rho.solids))
+
+    // Total mass of gaseous fractions [kg]
+    #includeFunc volIntegrateGasSpeciesFn(weightFields=(alpha.gas rho.gas))
+
+    // Mass flow rates [kg/s]
+    #includeFunc surfaceSumFn(select=patch,patch=inlet,fields=(alphaRhoPhi.solids alphaRhoPhi.gas))
+    #includeFunc surfaceSumFn(select=patch,patch=outlet,fields=(alphaRhoPhi.solids alphaRhoPhi.gas))
+
+    // Enthalpy fluxes [J/s]
+    #includeFunc surfaceSumFn(select=patch,patch=inlet,fields=(alphaRhoPhi.solids),weightFields=(h.solids))
+    #includeFunc surfaceSumFn(select=patch,patch=inlet,fields=(alphaRhoPhi.gas),weightFields=(h.gas))
+    #includeFunc surfaceSumFn(select=patch,patch=outlet,fields=(alphaRhoPhi.solids),weightFields=(h.solids))
+    #includeFunc surfaceSumFn(select=patch,patch=outlet,fields=(alphaRhoPhi.gas),weightFields=(h.gas))
+
+    // Total reaction rates (solid specie consumption rates) [mol/s]
+    #includeFunc volIntegrateFn(fields=(NRR_Abad_H2))
+    #includeFunc volIntegrateFn(fields=(NRR_Abad_CO))
+    #includeFunc volIntegrateFn(fields=(NRR_Abad_CH4))
+    #includeFunc volIntegrateFn(fields=(NRR_Abad_O2))
+
+    // An estimate of solids temperature (since only energy can be averaged, not T)
+    #includeFunc volAverageFn(weightField=alpha.solids,fields=(T.solids))
+
+    // Average gas density
+    #includeFunc volAverageFn(weightField=alpha.gas,fields=(rho.gas))
+}
+
+
+// ************************************************************************* //

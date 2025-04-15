@@ -1,0 +1,27 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+Description
+    Calculates (weighted) average over a patch for all species
+
+\*---------------------------------------------------------------------------*/
+
+#includeEtc "caseDicts/postProcessing/surfaceFieldValue/patchValue.cfg"
+
+#include "$FOAM_CASE/system/functionObject.cfg"
+
+operation       sum; // note: alphaRhoPhi has dimensions [kg/s], so no need to multiply by area
+
+weightField     alphaRhoPhi.solids;
+
+fields          ( // all species
+    Fe2O3.solids
+    FeO.solids
+    inerts.solids
+);
+
+// ************************************************************************* //

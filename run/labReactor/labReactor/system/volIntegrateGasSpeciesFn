@@ -1,0 +1,28 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+Description
+    
+
+\*---------------------------------------------------------------------------*/
+
+#includeEtc "caseDicts/postProcessing/volFieldValue/volIntegrate.cfg"
+
+#include "$FOAM_CASE/system/functionObject.cfg"
+
+fields          (
+    O2.gas
+    CO.gas
+    CO2.gas
+    H2O.gas
+    H2.gas
+    CH4.gas
+    N2.gas
+    // Ar.gas
+);
+
+// ************************************************************************* //

@@ -1,0 +1,1 @@
+../HeterogeneousShrinkingCoreReactions/HSCRAbadReactionRateAndDiffusionControlled.C

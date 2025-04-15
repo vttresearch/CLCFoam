@@ -1,0 +1,41 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version         2;
+    format          ascii;
+    class           volScalarField;
+    location        "0";
+    object          TO_BE_SET_BY_setICBC;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [ 0 0 0 0 0 0 0 ];
+
+#include "$FOAM_CASE/../../../src/common/getCorrespondingMassFraction"
+internalField  uniform $OUTPUT_getCorrespondingMassFraction;
+#remove OUTPUT_getCorrespondingMassFraction
+
+boundaryField
+{
+    "inlet_.*"
+    {
+        type            zeroGradient;
+    }
+    "outlet.*"
+    {
+        type            zeroGradient;
+    }
+    wall
+    {
+        type            zeroGradient;
+    }
+}
+
+
+// ************************************************************************* //

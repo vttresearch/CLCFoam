@@ -1,0 +1,88 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version         2;
+    format          ascii;
+    class           dictionary;
+    location        "";
+    object          caseParamsDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// In this files all case parameters are set. Then some other variables are
+// derived in the caseDict file and imported by all other case files.
+// [Leion 2008]
+//  450 mLn/min (1 bar, 25°C) - reducing periods
+// 1000 mLn/min (1 bar, 25°C) - oxidizing periods
+// see Ilmenite_Leion_2008 mahtcad
+// [Leion 2010, unpublished] and [Berguerand 2011]
+// 9*10^-4 Nm^3/min (1 bar, 25°C) = 900 mLn/min
+
+// ------------=== Parameters to modify ===-------------
+
+gas                 CH4;        // - name of the gas (H2,CO,CH4,syngas,O2)
+chemistry           act;        // - name of the chemistry model (pre/act)
+simTime             400;        // [s]   - simulation time
+timeStep            2.5e-05;    // [s]   - time step
+solidsMass          0.015;      // [kg]  - mass of solids (note that this mass will be enforced regardless of the OC state and its density correspondingly) (0.015 - Leion, 0.003 - Berguerand)
+particleD           152.5e-6;   // [m]   - diameter of ilmenite particle
+initialConversion   1;          // [-]   - 0 - fully reduced, 1 - fully oxidized
+T                   1223.15;    // [K]   - temperature setpoint below quartz plate (950°C) (Leion)
+nVolRate_mLn_min    450;        // [mLn/min] - inlet flow rate at normal temperature and pressure (450 - Leion, 900 - Berguerand)
+kN                  2;          // [-]   - mesh density factor (1 - coarse, 4 - fine)
+defaultSpecie       H2O;        // [-]   - default specie (no solved)
+rhoOxidized         3000;       // [kg/m^3] - density of fully oxidized state (bulk density was 2100 - Berguerand)
+
+
+// ------------=== Derived parameters ===-------------
+
+// ICvol    // [m^3]    - volume of the zone with solids in the initial condition
+// Based on volume of selected cells
+// Calculated using topoSetSetsDict
+// And calcVolumeOfSet
+// Or use integrate filter in paraFoam
+// gmsh: 7.55009566e-6
+//
+// Ainlet   // [m^3]    - area of the inlet
+// Taken from any surfaceFieldValue output in postProcessing folder
+// Or with paraview's IntegrateVariables->CellData filter
+// This is used only to estimate initial velocities in the internal field
+#ifeq $kN 1
+    ICvol   1.43634930438e-05;
+    Ainlet  3.629999999999e-04;
+#endif
+#ifeq $kN 2
+    ICvol   1.50131873187e-05;
+    Ainlet  3.758052534888e-04;
+#endif
+#ifeq $kN 3
+    ICvol   1.51560968432e-05;
+    Ainlet  3.782057309585e-04;
+#endif
+#ifeq $kN 4
+    ICvol   1.52132299189e-05;
+    Ainlet  3.782057309585e-04;
+#endif
+
+#ifeq $chemistry pre
+    Ro              0.04;       // [-]    - oxygen carrying capacity
+#endif
+#ifeq $chemistry act
+    Ro              0.033;      // [-]    - oxygen carrying capacity
+#endif
+
+#ifeq $gas O2
+    initialConversion   0.0;
+    defaultSpecie       N2;
+#endif
+#ifeq $gas CO
+    defaultSpecie       CO2;
+#endif
+
+// ************************************************************************* //

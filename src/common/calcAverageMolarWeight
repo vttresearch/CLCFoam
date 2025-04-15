@@ -1,0 +1,32 @@
+// Get average molar fraction of a given composition
+//
+// Inputs:
+//  INPUT_calcAverageMolarWeight - list of mass fractions, correspodning to species in constant/physicalProperties.gas
+//
+// Outputs:
+//  OUTPUT_calcAverageMolarWeight - [g/mol]
+//
+// Dependencies:
+//  constant/physicalProperties.gas
+
+OUTPUT_calcAverageMolarWeight #codeStream   // Output
+{
+    codeInclude
+    #{
+        #include "IOobject.H"
+        #include "OSspecific.H"
+    #};
+
+    code
+    #{
+        const List<scalar>& massFractions = dict.lookup<List<scalar>>("INPUT_calcAverageMolarWeight");
+        const wordList& species = $<wordList>{${FOAM_CASE}/constant/physicalProperties.gas!species};
+        scalar sum = 0;
+        forAll(species, i) {
+            const scalar& molarWeight = dict.lookupScoped<scalar>(getEnv("FOAM_CASE") + "/constant/physicalProperties.gas!" + species[i] + "/specie/molWeight", true, false);
+            sum += massFractions[i]/molarWeight;
+        }
+        os << 1/sum;
+    #};
+};
+

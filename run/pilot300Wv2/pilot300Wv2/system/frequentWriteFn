@@ -1,0 +1,35 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+Description
+    Writes the specified objects, e.g. fields, stored in the case database.
+
+\*---------------------------------------------------------------------------*/
+
+libs            ( "libutilityFunctionObjects.so" );
+type            writeObjects;
+
+writeControl	adjustableRunTime;
+writeInterval   1;
+
+objects
+(
+    "alpha.solids"
+    "p"
+    "O2.gas"
+    "Ar.gas"
+    "CO.gas"
+    "H2.gas"
+    "CO2.gas"
+    "U.gas"
+    "T.gas"
+    "T.solids"
+    "conversion"
+);
+
+
+// ************************************************************************* //

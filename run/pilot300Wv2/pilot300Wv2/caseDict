@@ -1,0 +1,111 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version         2;
+    format          ascii;
+    class           dictionary;
+    location        "";
+    object          caseDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// In this files all case parameters are set (see NOTE for exceptions).
+
+// NOTE dependencies:
+// Reads specie list and densities from physicalProperties.solids
+// Reads specie list from physicalProperties.gas
+
+// ------------=== Parameters to modify ===-------------
+
+#include "$FOAM_CASE/caseParamsDict"
+
+// ------------=== Derived parameters ===-------------
+
+// List of mass fractions for gaseous species at inlets
+INPUT_gasMassFractionsDictToList $composition_FR;
+    #include "$FOAM_CASE/../../../src/common/gasMassFractionsDictToList"
+        Y_gas_FR $OUTPUT_gasMassFractionsDictToList; 
+    #remove OUTPUT_gasMassFractionsDictToList
+#remove INPUT_gasMassFractionsDictToList
+
+INPUT_gasMassFractionsDictToList $composition_AR;
+    #include "$FOAM_CASE/../../../src/common/gasMassFractionsDictToList"
+        Y_gas_AR $OUTPUT_gasMassFractionsDictToList;
+    #remove OUTPUT_gasMassFractionsDictToList
+#remove INPUT_gasMassFractionsDictToList
+
+INPUT_gasMassFractionsDictToList $composition_SL;
+    #include "$FOAM_CASE/../../../src/common/gasMassFractionsDictToList"
+        Y_gas_SL $OUTPUT_gasMassFractionsDictToList;
+    #remove OUTPUT_gasMassFractionsDictToList
+#remove INPUT_gasMassFractionsDictToList
+
+INPUT_gasMassFractionsDictToList $composition_DC1;
+    #include "$FOAM_CASE/../../../src/common/gasMassFractionsDictToList"
+        Y_gas_DC1 $OUTPUT_gasMassFractionsDictToList;
+    #remove OUTPUT_gasMassFractionsDictToList
+#remove INPUT_gasMassFractionsDictToList
+
+INPUT_gasMassFractionsDictToList $composition_DC2;
+    #include "$FOAM_CASE/../../../src/common/gasMassFractionsDictToList"
+        Y_gas_DC2 $OUTPUT_gasMassFractionsDictToList;
+    #remove OUTPUT_gasMassFractionsDictToList
+#remove INPUT_gasMassFractionsDictToList
+
+
+
+INPUT_calcIlmeniteMassFractions_conversion $initialConversion;
+    #include "$FOAM_CASE/../../../src/common/calcIlmeniteMassFractions"
+        Y_solids $OUTPUT_calcIlmeniteMassFractions; // List of initial mass fractions of solid species
+    #remove OUTPUT_calcIlmeniteMassFractions
+#remove INPUT_calcIlmeniteMassFractions_conversion
+    
+INPUT_calcIlmeniteDensity_conversion $initialConversion;
+    #include "$FOAM_CASE/../../../src/common/calcIlmeniteDensity"
+        rho_solids_initial $OUTPUT_calcIlmeniteDensity; // [kg/m^3] - average solids density
+    #remove OUTPUT_calcIlmeniteDensity
+#remove INPUT_calcIlmeniteDensity_conversion
+
+
+
+// [kg/m^3] - average molar weights
+INPUT_calcAverageMolarWeight $Y_gas_FR;
+    #include "$FOAM_CASE/../../../src/common/calcAverageMolarWeight"
+        W_FR $OUTPUT_calcAverageMolarWeight;
+    #remove OUTPUT_calcAverageMolarWeight
+#remove INPUT_calcAverageMolarWeight
+
+INPUT_calcAverageMolarWeight $Y_gas_AR;
+    #include "$FOAM_CASE/../../../src/common/calcAverageMolarWeight"
+        W_AR $OUTPUT_calcAverageMolarWeight;
+    #remove OUTPUT_calcAverageMolarWeight
+#remove INPUT_calcAverageMolarWeight
+
+INPUT_calcAverageMolarWeight $Y_gas_SL;
+    #include "$FOAM_CASE/../../../src/common/calcAverageMolarWeight"
+        W_SL $OUTPUT_calcAverageMolarWeight;
+    #remove OUTPUT_calcAverageMolarWeight
+#remove INPUT_calcAverageMolarWeight
+
+INPUT_calcAverageMolarWeight $Y_gas_DC1;
+    #include "$FOAM_CASE/../../../src/common/calcAverageMolarWeight"
+        W_DC1 $OUTPUT_calcAverageMolarWeight;
+    #remove OUTPUT_calcAverageMolarWeight
+#remove INPUT_calcAverageMolarWeight
+
+INPUT_calcAverageMolarWeight $Y_gas_DC2;
+    #include "$FOAM_CASE/../../../src/common/calcAverageMolarWeight"
+        W_DC2 $OUTPUT_calcAverageMolarWeight;
+    #remove OUTPUT_calcAverageMolarWeight
+#remove INPUT_calcAverageMolarWeight
+
+
+alpha_solids #calc "$solidsMass / $domainVolume / $rho_solids_initial"; // [-] - volume fraction of solids, if we initialize uniform volume fraction for the whole domain
+
+// ************************************************************************* //

@@ -1,0 +1,18 @@
+#!/bin/bash -e
+
+source "../../../src/common/shellFunctions"
+
+# chemistry=$1
+# simulationType=$2
+
+# setParameter chemistry $chemistry
+# setParameter simulationType $simulationType
+
+echo "Preparing mesh... "
+./PrepareMesh
+echo "Setting ICBC... "
+setICBC
+echo "Setting fields... "
+setFields | tee log.setFields
+echo "Decomposing mesh... "
+decomposePar

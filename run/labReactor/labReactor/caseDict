@@ -1,0 +1,94 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version         2;
+    format          ascii;
+    class           dictionary;
+    location        "";
+    object          caseDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// In this files all case parameters are set (see NOTE for exceptions).
+//
+// NOTE dependencies:
+// Reads specie list and densities from physicalProperties.solids
+// Reads specie list from physicalProperties.gas
+
+// ------------=== Parameters to modify ===-------------
+
+#include "$FOAM_CASE/caseParamsDict"
+
+// ------------=== Physical constants ===-------------
+
+// ------------=== Load data from other dictionaries ===-------------
+
+// ------------=== Derived parameters ===-------------
+
+volumetricFlowRate #calc " $nVolRate_mLn_min * 1e-6 / 60 * $T / ( 25 + 273.15 ) "; // [m^3/s] NOTE the hardcoded temperature
+Uinlet #calc " $volumetricFlowRate / $Ainlet "; // [m/s] - inlet velocity
+
+Y_gas #codeStream
+{
+    codeInclude
+    #{
+        #include "calcFunctions.H"
+    #};
+
+    codeOptions
+    #{
+        -I$(FOAM_CASE)/../../../src/common/
+    #};
+
+    code
+    #{
+        const wordList species = dict.lookupScoped<wordList>("constant/physicalProperties.gas!species", true, false);
+        const word gas = $<word>gas;
+        List<scalar> mole_fractions(species.size(), 0.0);
+        List<scalar> molar_weights(species.size(), 0.0);
+        
+        if (findIndex(species, gas) != -1) {
+            if ( gas == "O2" ) {
+                mole_fractions[findIndex(species, "O2")] = 0.05; // 5% mole
+                mole_fractions[findIndex(species, "N2")] = 0.95; // 95% mole
+            } else {
+                mole_fractions[findIndex(species, gas)] = 1.0;
+            }
+        } else if ( gas == "syngas" ) {
+            mole_fractions[findIndex(species, "H2")] = 0.5;
+            mole_fractions[findIndex(species, "CO")] = 0.5;
+        } else {
+            FatalErrorInFunction
+            << "gas " << gas << " is not supported"
+            << exit(FatalError);
+        }
+
+        forAll(species, i) {
+            // ${${FOAM_CASE}/constant/physicalProperties.gas!CO2/specie/molWeight}
+            molar_weights[i] = dict.lookupScoped<scalar>("constant/physicalProperties.gas!" + species[i] + "/specie/molWeight", true, false);
+        }
+
+        List<scalar> mass_fractions = moleFractionsToMassFractions(mole_fractions, molar_weights);
+        os << mass_fractions;
+    #};
+};
+
+INPUT_calcIlmeniteMassFractions_conversion $initialConversion;
+    #include "$FOAM_CASE/../../../src/common/calcIlmeniteMassFractions"
+    Y_solids $OUTPUT_calcIlmeniteMassFractions; // List of initial mass fractions of solid species
+    #remove OUTPUT_calcIlmeniteMassFractions
+#remove INPUT_calcIlmeniteMassFractions_conversion
+
+INPUT_calcIlmeniteDensity_conversion $initialConversion;
+    #include "$FOAM_CASE/../../../src/common/calcIlmeniteDensity"
+    rho_solids $OUTPUT_calcIlmeniteDensity; // [kg/m^3] - average solids density
+    #remove OUTPUT_calcIlmeniteDensity
+#remove INPUT_calcIlmeniteDensity_conversion
+
+// ************************************************************************* //

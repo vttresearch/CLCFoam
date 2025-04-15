@@ -1,0 +1,27 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+Description
+    Calculates (weighted) sum over a faceZone for all species
+
+\*---------------------------------------------------------------------------*/
+
+#includeEtc "caseDicts/postProcessing/surfaceFieldValue/faceZoneFlowRate"
+
+#include "$FOAM_CASE/system/functionObject.cfg"
+
+weightField     alphaRhoPhi.solids;
+
+// Mistake! Oriented sum cannot be applied to these fields!
+
+fields          ( // all species
+  surfaceInterpolate(Fe2O3.solids)
+  surfaceInterpolate(FeO.solids)
+  surfaceInterpolate(inerts.solids)
+);
+
+// ************************************************************************* //

@@ -1,0 +1,27 @@
+# case folders
+run/0D/0D_*
+run/labReactor/labReactor_*
+run/pilot300Wv2/pilot300Wv2_*
+
+# compilation
+dynamicCode/
+
+# Build directories - anywhere
+linux*Clang*/
+linux*Gcc*/
+linux*Icc*/
+solaris*Gcc*/
+SunOS*Gcc*/
+platforms/
+
+# mesh
+polyMesh/
+
+*.pvsm
+
+# python
+__pycache__/
+
+# results
+*.mp4
+*.png

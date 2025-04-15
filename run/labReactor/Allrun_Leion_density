@@ -1,0 +1,32 @@
+#!/bin/bash
+
+source "../../src/common/shellFunctions"
+
+runDensityCase () {
+    chemistry=$1
+    rho=$2
+    CASE_NAME=labReactor_${chemistry}_CH4_rho${rho}
+    if [ ! -d "$CASE_NAME" ]; then
+        cp -r labReactor $CASE_NAME
+    else
+        echo "$CASE_NAME already exists"
+    fi
+    echo "./runCase $CASE_NAME --chemistry $chemistry --gas CH4 "\
+         " --rhoOxidized $rho --nVolRate_mLn_min 450 "\
+         " --defaultSpecie H2O "\
+         " --simTime 60 --T 1223.15 >/dev/null 2>&1 &"
+}
+
+# NOTE: rho=3000 case are Leion's labReactor_act_CH4 and labReactor_pre_CH4
+
+# chemistry=pre
+# for rho in 3500 4000 4100; 
+# do
+#     runDensityCase $chemistry $rho
+# done
+
+chemistry=act
+for rho in 2500 3500 4000 4500; 
+do
+    runDensityCase $chemistry $rho
+done

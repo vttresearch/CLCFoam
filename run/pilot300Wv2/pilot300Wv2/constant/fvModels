@@ -1,0 +1,45 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      fvModels;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+chemistry   ${${FOAM_CASE}/caseParamsDict!chemistry};
+VM          ${${FOAM_CASE}/caseDict!VM_NTP};
+
+#ifeq $chemistry pre
+    #include "$FOAM_CASE/../../../etc/caseDicts/fvModels_pre"
+#endif
+
+#ifeq $chemistry act
+    #include "$FOAM_CASE/../../../etc/caseDicts/fvModels_act"
+#endif
+
+massSource_DC1
+{
+    type            massSource;
+
+    select          cellSet;
+    cellSet         inlet_DC;
+
+    Vn              ${${FOAM_CASE}/caseDict!inlet_DC1}; // [Ln/min] - volumetric flow at NTP
+    rhon            ${${FOAM_CASE}/caseDict!rho_DC1};  // [kg/m^3] - gas density at NTP
+    W               ${${FOAM_CASE}/caseDict!W_DC1};     // [kg/m^3] - gas molar weight
+    massFlowRate    #calc " ( $Vn / 1000.0 / 60.0 ) / $VM * ( $W / 1000 )"; // [kg/s]
+
+    phase           gas;
+    rho             rho.gas;
+}
+
+// ************************************************************************* //

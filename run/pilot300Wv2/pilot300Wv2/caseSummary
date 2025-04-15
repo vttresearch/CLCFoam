@@ -1,0 +1,17 @@
+#!/bin/bash
+
+time=0
+
+Min_AR=$(foamDictionary -entry boundaryField/inlet_AR/massFlow  -value -expand processor0/${time}/U.gas | tail -1)
+Min_FR=$(foamDictionary -entry boundaryField/inlet_FR/massFlow -value -expand processor0/${time}/U.gas | tail -1)
+Min_SL=$(foamDictionary -entry boundaryField/inlet_SL/massFlow -value -expand processor0/${time}/U.gas | tail -1)
+Min_DC2=$(foamDictionary -entry boundaryField/inlet_DC2/massFlow -value -expand processor0/${time}/U.gas | tail -1)
+Min_DC=$(foamDictionary -entry massSource_DC/massFlowRate -value -expand constant/fvModels_massSource_DC | tail -1)
+
+# T=$(foamDictionary -entry params_T -value params)
+
+printf "AR    %s\n" ${Min_AR}
+printf "FR    %s\n" ${Min_FR}
+printf "SL    %s\n" ${Min_SL}
+printf "DC    %s\n" ${Min_DC}
+printf "DC2   %s\n" ${Min_DC2}

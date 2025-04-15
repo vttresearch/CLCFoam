@@ -1,0 +1,46 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+Description
+    Writes out values of fields from cells nearest to specified locations.
+
+\*---------------------------------------------------------------------------*/
+
+points  (
+    (0 0 0)
+);
+
+fields  (
+    FeO.solids
+    Fe2O3.solids
+    inerts.solids
+    CO.gas
+    CO2.gas
+    H2.gas
+    H2O.gas
+    O2.gas
+    CH4.gas
+    N2.gas
+    X_FeO.solids
+    X_Fe2O3.solids
+    X_inerts.solids
+    X_CO.gas
+    X_CO2.gas
+    X_H2.gas
+    X_H2O.gas
+    X_O2.gas
+    X_CH4.gas
+    X_N2.gas
+    conversion
+    T.gas
+    T.solids
+    p
+);
+
+#includeEtc "caseDicts/postProcessing/probes/probes.cfg"
+
+// ************************************************************************* //

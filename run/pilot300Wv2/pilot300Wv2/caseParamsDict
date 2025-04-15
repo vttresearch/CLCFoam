@@ -1,0 +1,125 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version         2;
+    format          ascii;
+    class           dictionary;
+    location        "";
+    object          caseParamsDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// In this files all case parameters are set. Then some other variables are
+// derived in the caseDict file and imported by all other case files.
+
+// ------------=== Physical constants ===-------------
+
+// Molar volume of an ideal gas at NTP
+T_NTP   293.15;  // [K]
+p_NTP   101325;  // [Pa]
+R       8.31446; // [J/K/mol]
+VM_NTP  #calc " $R * $T_NTP / $p_NTP "; // [m^3/mol]
+
+// ------------=== Parameters to modify ===-------------
+
+simulationType      fresh;
+chemistry           act;        // - name of the chemistry model (pre/act)
+solidsMass          0.270;      // [kg]   - total mass of solids
+domainVolume        0.001629840205;  // [m^3]  - total volume of the domain (foamPostProcess -solver multiphaseEuler -func "volIntegrate(fields=(H2O.gas))" -time 0)
+initialBedVolume    0.0002798144792; // [m^3]  - volume of solids_loading set, calc with foamPostProcess -func calcVolumeOfSet
+particleD           152.5e-6;   // [m]    - diameter of ilmenite particle (fresh=152.5e-6, used31h=182e-6, used85h=161e-6)        
+initialConversion   0.96;       // [-]    - 0 - fully reduced, 1 - fully oxidized
+T                   1173.15;    // [K]    - temperature (900°C)
+rhoOxidized         3000;       // [kg/m^3] - density of fully oxidized state
+
+// ------------=== Gas compositions ===-------------
+
+composition_air {
+    N2  0.7551;
+    O2  0.2314;
+    CO  0.0000;
+    CO2 0.0005;
+    Ar  0.0130;
+};
+rho_air 1.184318;
+
+composition_CO2 {
+    CO2 1.0000;
+};
+rho_CO2 1.807970;
+
+composition_Ar {
+    Ar  1.0000;
+};
+rho_Ar 1.633864;
+
+composition_syngas_diluted_with_H2O {
+    CO  0.7523;
+    H2O 0.1935;
+    H2  0.0542;
+};
+rho_syngas_diluted_with_H2O 0.61348;
+
+// ------------=== Derived parameters ===-------------
+
+#ifeq $simulationType leakage // [Table 13.1, p.13, Moldenhauer's thesis]
+    chemistry disable; // disabling chemistry
+
+    // [Ln/min]
+    inlet_FR  1.4;
+    inlet_AR  7.2;
+    inlet_SL  0.10;
+    inlet_DC1 0.30;
+    inlet_DC2 0.00;
+
+    composition_FR  $composition_Ar;
+    composition_AR  $composition_air;
+    composition_SL  $composition_CO2;
+    composition_DC1 $composition_CO2;
+    composition_DC2 $composition_CO2;
+
+    // [kg/m^3]
+    rho_FR  $rho_Ar;
+    rho_AR  $rho_air;
+    rho_SL  $rho_CO2;
+    rho_DC1 $rho_CO2;
+    rho_DC2 $rho_CO2;
+#endif
+#ifeq $simulationType fresh // [Table 13.6, p.23, Moldenhauer's thesis]
+    // [Ln/min]
+    inlet_FR  1.7;
+    inlet_AR  7.2;
+    inlet_SL  0.10;
+    inlet_DC1 0.14;
+    inlet_DC2 0.21;
+
+    composition_FR  $composition_syngas_diluted_with_H2O;
+    composition_AR  $composition_air;
+    composition_SL  $composition_Ar;
+    composition_DC1 $composition_Ar;
+    composition_DC2 $composition_Ar;
+
+    // [kg/m^3]
+    rho_FR  $rho_syngas_diluted_with_H2O;
+    rho_AR  $rho_air;
+    rho_SL  $rho_Ar;
+    rho_DC1 $rho_Ar;
+    rho_DC2 $rho_Ar;
+#endif
+
+#ifeq $chemistry pre
+    // rhoOxidized         4100;       // [kg/m^3] - density of fully oxidized state
+    Ro                  0.04;       // [-]    - oxygen carrying capacity
+#endif
+#ifeq $chemistry act
+    // rhoOxidized         4250;       // [kg/m^3] - density of fully oxidized state
+    Ro                  0.033;      // [-]    - oxygen carrying capacity
+#endif
+
+// ************************************************************************* //

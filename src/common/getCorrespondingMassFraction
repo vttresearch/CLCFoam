@@ -1,0 +1,41 @@
+// Get mass fraction of a component using the name of the dictionaty (e.g. H2O.gas)
+//
+// Inputs:
+//  (optional) INPUT_getCorrespondingMassFraction_postfix - to be added to Y_{phase}_{postfix}. If not defined, Y_{phase} is used
+//
+// Outputs:
+//  OUTPUT_getCorrespondingMassFraction  - mass fraction of the specie
+//
+// Dependencies:
+//  constant/physicalProperties.gas
+//  constant/physicalProperties.solids
+
+OUTPUT_getCorrespondingMassFraction #codeStream   // Output
+{
+    codeInclude
+    #{
+        #include "IOobject.H"
+        #include "OSspecific.H"
+    #};
+
+    code
+    #{
+        const word& field_name = dict.topDict().dictName();
+        const word specie = IOobject::member(field_name);
+        const word phase = IOobject::group(field_name);
+
+        word YListName("Y_" + phase);
+        if (dict.found("INPUT_getCorrespondingMassFraction_postfix")) {
+            YListName += "_" + dict.lookup<word>("INPUT_getCorrespondingMassFraction_postfix");
+        }
+
+        List<scalar> Ys = dict.lookupScoped<List<scalar>>("../caseDict!" + YListName, true, false);
+
+        const wordList& species = dict.lookupScoped<wordList>(getEnv("FOAM_CASE") + "/constant/physicalProperties." + phase + "!species", true, false);
+
+        const scalar& Y = Ys[findIndex(species, specie)];
+
+        os << Y;
+    #};
+};
+

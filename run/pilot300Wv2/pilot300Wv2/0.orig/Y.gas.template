@@ -1,0 +1,92 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version         2;
+    format          ascii;
+    class           volScalarField;
+    location        "0";
+    object          TO_BE_SET_BY_setICBC;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [ 0 0 0 0 0 0 0 ];
+
+INPUT_getCorrespondingMassFraction_postfix AR;
+    #include "$FOAM_CASE/../../../src/common/getCorrespondingMassFraction"
+    internalField  uniform $OUTPUT_getCorrespondingMassFraction;
+    #remove OUTPUT_getCorrespondingMassFraction
+#remove INPUT_getCorrespondingMassFraction_postfix
+
+boundaryField
+{
+    inlet_FR
+    {   
+        type    fixedValue;
+        INPUT_getCorrespondingMassFraction_postfix FR;
+            #include "$FOAM_CASE/../../../src/common/getCorrespondingMassFraction"
+            value  uniform $OUTPUT_getCorrespondingMassFraction;
+            #remove OUTPUT_getCorrespondingMassFraction
+        #remove INPUT_getCorrespondingMassFraction_postfix
+    }
+    inlet_AR
+    {
+        type    fixedValue;
+        INPUT_getCorrespondingMassFraction_postfix AR;
+            #include "$FOAM_CASE/../../../src/common/getCorrespondingMassFraction"
+            value  uniform $OUTPUT_getCorrespondingMassFraction;
+            #remove OUTPUT_getCorrespondingMassFraction
+        #remove INPUT_getCorrespondingMassFraction_postfix
+    }
+    inlet_SL
+    {
+        type    fixedValue;
+        INPUT_getCorrespondingMassFraction_postfix SL;
+            #include "$FOAM_CASE/../../../src/common/getCorrespondingMassFraction"
+            value  uniform $OUTPUT_getCorrespondingMassFraction;
+            #remove OUTPUT_getCorrespondingMassFraction
+        #remove INPUT_getCorrespondingMassFraction_postfix
+    }
+    inlet_DC2
+    {
+        type    fixedValue;
+        INPUT_getCorrespondingMassFraction_postfix DC2;
+            #include "$FOAM_CASE/../../../src/common/getCorrespondingMassFraction"
+            value  uniform $OUTPUT_getCorrespondingMassFraction;
+            #remove OUTPUT_getCorrespondingMassFraction
+        #remove INPUT_getCorrespondingMassFraction_postfix
+    }
+    outlet_AR
+    {
+        type    zeroGradient;
+    }
+    outlet_FR
+    {
+        type    zeroGradient;
+    }
+    wall
+    {
+        type    zeroGradient;
+    }
+}
+
+sources
+{
+    massSource_DC1
+    {
+        type            uniformFixedValue;
+        INPUT_getCorrespondingMassFraction_postfix DC1;
+            #include "$FOAM_CASE/../../../src/common/getCorrespondingMassFraction" // [-] - Mass fraction of the specie FoamFile/object
+            uniformValue    $OUTPUT_getCorrespondingMassFraction;
+            #remove OUTPUT_getCorrespondingMassFraction
+        #remove INPUT_getCorrespondingMassFraction_postfix
+    }
+}
+
+
+// ************************************************************************* //

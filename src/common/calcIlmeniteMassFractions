@@ -1,0 +1,37 @@
+// Calculation of a list of mass fractions of solid species with given conversion
+//
+// Inputs:
+//  INPUT_calcIlmeniteMassFractions_conversion   - current conversion state (0 - fully reduced, 1 - fully oxidized)
+//
+// Outputs:
+//  OUTPUT_calcIlmeniteMassFractions    - list of mass fractions, correspodning to species in constant/physicalProperties.solids
+//
+// Dependencies:
+//  constant/physicalProperties.solids
+
+OUTPUT_calcIlmeniteMassFractions #codeStream   // Output
+{
+    codeInclude
+    #{
+        #include "calcFunctions.H"
+    #};
+
+    codeOptions
+    #{
+        -I$(FOAM_CASE)/../../../src/common/
+    #};
+
+    code
+    #{
+        ;
+        os << calcIlmeniteMassFractions(
+            // $<wordList>TEMP_CALC_species_solids, 
+            $<wordList>{${FOAM_CASE}/constant/physicalProperties.solids!species},
+            $<scalar>{${FOAM_CASE}/constant/physicalProperties.solids!Fe2O3/equationOfState/rho}, 
+            $<scalar>{${FOAM_CASE}/constant/physicalProperties.solids!FeO/equationOfState/rho}, 
+            $<scalar>{${FOAM_CASE}/constant/physicalProperties.solids!inerts/equationOfState/rho},
+            $<scalar>{${FOAM_CASE}/constant/physicalProperties.solids!Ro},
+            $<scalar>INPUT_calcIlmeniteMassFractions_conversion    // Input
+        );
+    #};
+};

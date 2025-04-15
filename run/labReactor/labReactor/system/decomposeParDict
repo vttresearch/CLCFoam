@@ -1,0 +1,35 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      decomposeParDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+numberOfSubdomains  9;
+
+method          scotch;
+
+simpleCoeffs {
+    // n #calc
+    // #{
+    //     const label n = $numberOfSubdomains;
+    //     vector v(1,n,1);
+    //     if (n % 4 == 0) {
+    //         v.x()=2, v.z()=2, v.y()=n/4;
+    //     }
+    //     os  << v;
+    // #};
+    // n (2 7 2);
+    n (2 2 2);
+}
+
+// ************************************************************************* //

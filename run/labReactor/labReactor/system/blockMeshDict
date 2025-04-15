@@ -1,0 +1,159 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+kN      ${${FOAM_CASE}/caseDict!kN};  // [-] - mesh density factor 
+
+convertToMeters 1.0;
+
+D       0.022;         // [m] - diameter
+H       0.16;          // [m] - height
+k_sqr   0.4;           // [-] - fraction of diameter = square diagonal
+// (WARNING: decomposeParDict)
+
+
+R2      #calc "$D / 2";
+R1      #calc "$k_sqr*$R2";
+
+
+posX2   #calc "$R2*sin(constant::mathematical::pi/4)";
+posX1   #calc "$k_sqr*$posX2";
+negX1   #neg $posX1;
+negX2   #neg $posX2;
+
+R12     #calc "1.1*$posX1";
+
+y0      0;
+y1      $H;
+
+Ny      #calc "$kN * 30";
+Nsqr    #calc "$kN * 3";
+Nrad    #calc "$kN * 6";
+
+vertices
+(
+    ( $negX1 $y0 $negX1 ) // 0
+    ( $negX1 $y1 $negX1 ) // 1
+    ( $posX1 $y0 $negX1 ) // 2
+    ( $posX1 $y1 $negX1 ) // 3
+    ( $posX1 $y0 $posX1 ) // 4
+    ( $posX1 $y1 $posX1 ) // 5
+    ( $negX1 $y0 $posX1 ) // 6
+    ( $negX1 $y1 $posX1 ) // 7
+
+    ( $negX2 $y0 $negX2 ) // 8
+    ( $negX2 $y1 $negX2 ) // 9
+    ( $posX2 $y0 $negX2 ) // 10
+    ( $posX2 $y1 $negX2 ) // 11
+    ( $posX2 $y0 $posX2 ) // 12
+    ( $posX2 $y1 $posX2 ) // 13
+    ( $negX2 $y0 $posX2 ) // 14
+    ( $negX2 $y1 $posX2 ) // 15
+);
+
+gr (
+    (0.2 0.5 1)    // 20% y-dir, 50% cells, expansion = 1
+    (0.8 0.5 10)   // 80% y-dir, 50% cells, expansion = 10
+);
+
+grR 4;
+
+blocks
+(
+    // center
+    hex (  0  2  3  1  6  4  5  7 ) ($Nsqr $Ny $Nsqr) simpleGrading (1 $gr 1)
+
+    // left
+    hex (  8  0  1  9 14  6  7 15 ) ($Nrad $Ny $Nsqr) simpleGrading ($grR $gr 1)
+
+    // bottom
+    hex (  8 10 11  9  0  2  3  1 ) ($Nsqr $Ny $Nrad) simpleGrading (1 $gr $grR)
+
+    // right
+    hex (  2 10 11  3  4 12 13  5 ) ($Nrad $Ny $Nsqr) simpleGrading (#calc "1./$grR" $gr 1)
+
+    // top
+    hex (  6  4  5  7 14 12 13 15 ) ($Nsqr $Ny $Nrad) simpleGrading (1 $gr #calc "1./$grR")
+);
+
+edges
+(
+    arc  0  2 (0 0 #neg $R12)
+    arc  1  3 (0 $y1 #neg $R12)
+
+    arc  2  4 ($R12 0 0)
+    arc  3  5 ($R12 $y1 0)
+
+    arc  4  6 (0 0 $R12)
+    arc  5  7 (0 $y1 $R12)
+
+    arc  6  0 (#neg $R12 0 0)
+    arc  7  1 (#neg $R12 $y1 0)
+
+
+    arc  8 10 (0 0 #neg $R2)
+    arc  9 11 (0 $y1 #neg $R2)
+
+    arc 10 12 ($R2 0 0)
+    arc 11 13 ($R2 $y1 0)
+
+    arc 12 14 (0 0 $R2)
+    arc 13 15 (0 $y1 $R2)
+
+    arc 14  8 (#neg $R2 0 0)
+    arc 15  9 (#neg $R2 $y1 0)
+);
+
+boundary
+(
+    inlet
+    {
+        type patch;
+        faces
+        (
+            (  0  2  4  6 ) // center
+            (  8  0  6 14 ) // left
+            (  8 10  2  0 ) // bottom
+            (  2 10 12  4 ) // right
+            (  6  4 12 14 ) // top
+        );
+    }
+
+    
+
+    outlet
+    {
+        type patch;
+        faces
+        (
+            (  3  1  7  5 ) // center
+            ( 11  3  5 13 ) // left
+            ( 11  9  1  3 ) // bottom
+            (  1  9 15  7 ) // right
+            (  5  7 15 13 ) // top
+        );
+    }
+);
+
+defaultPatch
+{
+    name wall;
+    type wall;
+}
+
+mergePatchPairs
+(
+);

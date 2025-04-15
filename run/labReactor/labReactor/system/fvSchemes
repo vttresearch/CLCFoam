@@ -1,0 +1,101 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSchemes;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ddtSchemes
+{
+   // default             localEuler rDeltaT;
+    default             Euler;
+    
+}
+
+gradSchemes
+{
+    default             Gauss linear;
+    //"grad(U.*)"       cellMDLimited pointCellsLeastSquares 1;
+    grad(U)nut          faceLimited Gauss linear 1;
+    grad(p_rgh)         Gauss linear;
+    "grad\(alpha.*\)"   Gauss linear;
+    "grad\(1-alpha.*\)" Gauss linear;
+}
+
+divSchemes
+{
+    default                         Gauss linear;
+    "div\(phi,alpha.*\)"            Gauss vanLeer;
+    "div\(phir,alpha.*\)"           Gauss vanLeer;
+
+    "div\(alphaRhoPhi.*,U.*\)"      Gauss limitedLinearV 1;
+    "div\(phi.*,U.*\)"              Gauss limitedLinearV 1;
+    "div\(alphaRhoPhi.*,.*rho.*\)"  Gauss linear;
+
+    "div\(alphaRhoPhi.*,(h|e).*\)"  Gauss limitedLinear 1;
+    "div\(alphaRhoPhi.*,Yi\)"       Gauss limitedLinear 1;
+    "div\(alphaRhoPhi.*,(K.*|p)\)"  Gauss limitedLinear 1;
+
+    "div(RSM)"                      Gauss limitedLinear 1;
+
+    div(alphaRhoPhi.solids,Theta.solids) Gauss limitedLinear 1;
+ 
+    
+    "div\(alphaRhoPhi.*,(k|epsilon).*\)"  Gauss limitedLinear 1;
+
+    divDevTau Gauss linear;
+
+    div(alphaRhoPhi.solids,d.solids) Gauss upwind;
+
+    div(Ji,Ii_h)   Gauss upwind;//bounded Gauss linearUpwind grad(Ii_h);
+    
+    div((((thermo:rho.solids*nut.solids)*dev2(T(grad(U.solids))))+(((thermo:rho.solids*lambda.solids)*div(phi.solids))*I)))  Gauss linear;
+ 
+
+}
+
+laplacianSchemes
+{
+    // default     Gauss linear orthogonal;
+    default     Gauss linear limited 0.5;
+    bounded     Gauss linear limited 0.5;
+}
+
+interpolationSchemes
+{
+    default     linear;
+}
+
+snGradSchemes
+{
+    // default     orthogonal;
+    default     limited 0.5;
+    bounded     limited 0.5;
+
+}
+
+fluxRequired
+{
+    default     no;
+    p_rgh;
+    alpha.solids;
+}
+
+wallDist
+{
+    method Poisson;
+    nRequired yes;
+}
+
+
+// ************************************************************************* //

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+source "../../../src/common/shellFunctions"
+
+./PrepareMesh
+setICBC
+setFields >log.setFields 2>&1
+
+decomposePar >log.decomposePar 2>&1
+NPROCS=$(foamDictionary -entry numberOfSubdomains -value system/decomposeParDict)
+mpirun -np $NPROCS foamRun -solver multiphaseEuler -parallel > log.foamRun

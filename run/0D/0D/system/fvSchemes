@@ -1,0 +1,185 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSchemes;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ddtSchemes
+{
+    default             Euler;
+}
+
+gradSchemes
+{
+    grad(U)nut          faceLimited Gauss linear 1;
+    grad(p_rgh)         Gauss linear;
+    grad(rho)           Gauss linear;
+
+    grad(alpha.solids)  Gauss linear;
+    grad(U.solids)      Gauss linear;
+    grad(Theta.solids)  Gauss linear;
+    grad(FeO.solids)    Gauss linear;
+    grad(Fe2O3.solids)  Gauss linear;
+
+    grad(alpha.gas)     Gauss linear;
+    grad(U.gas)         Gauss linear;
+    grad(e.gas)         Gauss linear;
+    grad(K.gas)         Gauss linear;
+    grad(N2.gas)        Gauss linear;
+    grad(O2.gas)        Gauss linear;
+    grad(CO2.gas)       Gauss linear;
+    grad(CO.gas)        Gauss linear;
+    grad(H2O.gas)       Gauss linear;
+    grad(H2.gas)        Gauss linear;
+    grad(CH4.gas)       Gauss linear;
+    grad(Ar.gas)        Gauss linear;
+
+    // For T!=const solids
+        grad(h.solids)      Gauss linear;
+        grad(K.solids)      Gauss linear;
+        
+    // For gas energy=sensibleEnthalpy
+    grad(h.gas)         Gauss linear;
+}
+
+divSchemes
+{
+    div(phi,alpha.gas)                  Gauss vanLeer;
+    div(phi,alpha.solids)               Gauss vanLeer;
+    div(phir,alpha.solids,alpha.gas)    Gauss vanLeer;
+    div(phir,alpha.gas,alpha.solids)    Gauss vanLeer;
+
+    div(alphaRhoPhi.gas,U.gas)          Gauss limitedLinearV 1;
+    div(alphaRhoPhi.gas,e.gas)          Gauss limitedLinear 1;
+    div(alphaRhoPhi.gas,K.gas)          Gauss limitedLinear 1;
+    div(alphaRhoPhi.gas,Yi)             Gauss limitedLinear 1;
+    div(alphaRhoPhi.gas,(p|rho.gas))    Gauss linear;
+
+    div(alphaRhoPhi.solids,U.solids)    Gauss limitedLinearV 1;
+    div(alphaRhoPhi.solids,Yi)          Gauss limitedLinear 1;
+    div(alphaRhoPhi.solids,Theta.solids) Gauss limitedLinear 1;
+
+    divDevTau(U.solids)                 Gauss linear;
+
+    div((((alpha.gas*rho.gas)*nuEff.gas)*dev2(T(grad(U.gas))))) Gauss linear;
+
+    // For T!=const solids
+    div(alphaRhoPhi.solids,K.solids)    Gauss limitedLinear 1;
+    div(alphaRhoPhi.solids,h.solids)    Gauss limitedLinear 1;
+    
+    // For gas energy=sensibleEnthalpy
+    div(alphaRhoPhi.gas,h.gas)          Gauss limitedLinear 1;
+}
+
+laplacianSchemes
+{
+    laplacian((alpha.solids*DEff),FeO.solids)   Gauss linear limited 0.5;
+    laplacian((alpha.solids*DEff),Fe2O3.solids) Gauss linear limited 0.5;
+    laplacian((alpha.gas*DEff),N2.gas)          Gauss linear limited 0.5;
+    laplacian((alpha.gas*DEff),O2.gas)          Gauss linear limited 0.5;
+    laplacian((alpha.gas*DEff),CO.gas)          Gauss linear limited 0.5;
+    laplacian((alpha.gas*DEff),CO2.gas)         Gauss linear limited 0.5;
+    laplacian((alpha.gas*DEff),H2O.gas)         Gauss linear limited 0.5;
+    laplacian((alpha.gas*DEff),H2.gas)          Gauss linear limited 0.5;
+    laplacian((alpha.gas*DEff),CH4.gas)         Gauss linear limited 0.5;
+    laplacian((alpha.gas*DEff),Ar.gas)         Gauss linear limited 0.5;
+    laplacian((rho.solids*(nut.solids+kineticTheory:nuFric.solids)),U.solids)   Gauss linear limited 0.5;
+    laplacian(((alpha.gas*rho.gas)*nuEff.gas),U.gas)    Gauss linear limited 0.5;
+    laplacian((alpha.gas*alphahe),e.gas)        Gauss linear limited 0.5;
+    laplacian(rAUf,p_rgh)                       Gauss linear limited 0.5;
+    laplacian(kappa,Theta)                      Gauss linear limited 0.5;
+    bounded                                     Gauss linear limited 0.5;
+
+    // For T!=const solids
+        laplacian((alpha.solids*((kappa.solids|Cp.solids)+alphat.solids)),h.solids) Gauss linear limited 0.5;
+
+    // For gas energy=sensibleEnthalpy
+    laplacian((alpha.gas*alphahe),h.gas)        Gauss linear limited 0.5;
+
+    // After TASIFNG-319530d58679 (31 August 2023)
+    laplacian(rAf,p_rgh)                        Gauss linear limited 0.5;
+}
+
+interpolationSchemes
+{
+    flux(U.solids)                              linear;
+    flux(U.gas)                                 linear;
+    interpolate(alpha.solids)                   linear;
+    interpolate(alpha.gas)                      linear;
+    interpolate(rho.solids)                     linear;
+    interpolate(rho.gas)                        linear;
+    interpolate((max(alpha.solids,residualAlpha)*rAU.solids))   linear;
+    interpolate((max(alpha.gas,residualAlpha)*rAU.gas))         linear;
+    interpolate((rAU.solids*pPrime.solids))     linear;
+    interpolate((rAU.gas*pPrime.gas))           linear;
+    interpolate((rho.solids-rho))               linear;
+    interpolate((rho.gas-rho))                  linear;
+    flux(U.solids_0)                            linear;
+    flux(U.gas_0)                               linear;
+    interpolate(average(interpolate(alpha.solids))) linear;
+    interpolate((((alpha.solids_0*rho.solids_0)*rAU.solids)|deltaT))    linear;
+    interpolate(average(interpolate(alpha.gas)))                        linear;
+    interpolate((((alpha.gas_0*rho.gas_0)*rAU.gas)|deltaT))             linear;
+    flux(HbyA.solids)                           linear;
+    flux(HbyA.gas)                              linear;
+    interpolate((alpha.gas|max((1-alpha.solids),residualAlpha)))        linear;
+    interpolate((alpha.solids|max((1-alpha.gas),residualAlpha)))        linear;
+    interpolate(max((1-alpha.solids),0))        linear;
+    interpolate(max(alpha.solids,0))            linear;
+
+    pPrime.solids                               linear;
+    pPrime.gas                                  linear;
+    interpolate(max(alpha.gas,0))               linear;
+    interpolate(pPrime.solids)                  linear;
+    interpolate(rA.solids)                      linear;
+    interpolate(rA.gas)                         linear;
+
+    flux((-((alpha.gas*rho.gas)*nuEff.gas)*dev2(T(grad(U.gas))))) linear;
+
+    interpolate((A(U.solids)+((max((residualAlpha-alpha.solids),0)*rho.solids)|deltaT)))    linear;
+    interpolate((A(U.gas)+((max((residualAlpha-alpha.gas),0)*rho.gas)|deltaT)))             linear;
+    interpolate(max(alpha.solids,residualAlpha))                    linear;
+    interpolate(max(alpha.gas,residualAlpha))                       linear;
+    dotInterpolate(Sf,((alpha.solids_0*rho.solids_0)*U.solids_0))   linear;
+    interpolate((alpha.solids_0*rho.solids_0))                      linear;
+    dotInterpolate(Sf,U.solids_0)                                   linear;
+    dotInterpolate(Sf,((alpha.gas_0*rho.gas_0)*U.gas_0))            linear;
+    interpolate((alpha.gas_0*rho.gas_0))                            linear;
+    dotInterpolate(Sf,U.gas_0)                                      linear;
+    flux(H.solids)                                                  linear;
+    flux(H.gas)                                                     linear;
+
+    // For backward scheme
+    dotInterpolate(Sf,(((2*(alpha.solids_0*rho.solids_0))*U.solids_0)-((0.5*(alpha.solids_0_0*rho.solids_0_0))*U.solids_0_0))) linear;
+    interpolate((alpha.solids_0_0*rho.solids_0_0)) linear;
+    dotInterpolate(Sf,(((2*(alpha.gas_0*rho.gas_0))*U.gas_0)-((0.5*(alpha.gas_0_0*rho.gas_0_0))*U.gas_0_0))) linear;
+    interpolate((alpha.gas_0_0*rho.gas_0_0)) linear;
+
+    // After TASIFNG-319530d58679 (31 August 2023)
+    flux((H(U.solids)+(((max((residualAlpha-alpha.solids),0)*rho.solids)|deltaT)*U.solids_0))) linear;
+    flux((H(U.gas)+(((max((residualAlpha-alpha.gas),0)*rho.gas)|deltaT)*U.gas_0))) linear;
+
+    interpolate(h.gas) linear;
+}
+
+snGradSchemes
+{
+    snGrad(alpha.solids)    limited 0.5;
+    snGrad(alpha.gas)       limited 0.5;
+    snGrad(rho)             limited 0.5;
+    bounded                 limited 0.5;
+}
+
+
+// ************************************************************************* //

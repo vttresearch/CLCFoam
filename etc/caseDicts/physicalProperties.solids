@@ -1,0 +1,152 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      physicalProperties.solids;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// WARNING: the following properties are to be set by importing dictionary:
+// Ro               0.033;   // [-] oxygen carrying capacity (0.04 for pre-oxidized)
+// rho_ox           4250;    // [kg/m^3] - density of the fully-oxidized state (Fe2O3 and inerts) (4100 for pre-oxidized)
+
+thermoType
+{
+    type            heRhoThermo;
+    mixture         multiComponentMixture;
+    transport       const;
+    thermo          janaf;
+    equationOfState rhoConst;
+    specie          specie;
+    energy          sensibleEnthalpy; // Internal energy might be better, since in theory we assume V=const
+}
+
+species (
+    Fe2O3
+    FeO
+    inerts
+    );
+    
+defaultSpecie    inerts;
+
+MW_Fe2O3 159.687;
+MW_FeO   71.844;
+rho_FeO #codeStream //  [kg/m^3] - density of the reduced part - FeO
+{
+    code
+    #{
+        const scalar MW_Fe2O3 = $MW_Fe2O3;
+        const scalar MW_FeO   = $MW_FeO;
+        os << 2*MW_FeO/MW_Fe2O3*$rho_ox;
+    #};
+};
+
+// Molecular weights obtained based on https://github.com/Cantera/cantera/blob/03f5b82352f47ceec7cc0c044295546b30b2be2d/src/thermo/Elements.cpp#L67
+// Thermodynamics data obtained from McBride et al. 1993
+// https://ntrs.nasa.gov/citations/19940013151
+
+// Enthalpies of formation are obtained from JANAF polynomials with checkThermo
+
+// Heat capacity is set to large value to disable reaction heat of thermo=hConst
+Cp 1e15;
+
+Fe2O3
+{
+    specie
+    {
+        molWeight   $MW_Fe2O3;
+    }
+    thermodynamics // [McBride et al. 1993, p.59]
+    {
+        Tlow            300;
+        Thigh           2500;
+        Tcommon         1000;
+        // // Original values, corresponding to the reaction heat of oxidation = 562 kJ/mol
+        // highCpCoeffs    (  4.04975300E+01 -4.61315960E-02  3.18264060E-05 -8.92263310E-09  8.46554170E-13 -1.13176270E+05 -2.16350880E+02 );
+        // lowCpCoeffs     ( -7.70378430E+00  1.36474710E-01 -3.29056550E-04  3.81504780E-07 -1.63102850E-10 -1.00800760E+05  2.52920850E+01 );
+
+        // Corrected values, corresponding to reaction heat at 925 degree Celsius = 468.5 kJ/mol [Hallberg et al., 2011]
+        highCpCoeffs    (  4.04975300E+01 -4.61315960E-02  3.18264060E-05 -8.92263310E-09  8.46554170E-13 -1.09112082E+05 -2.16350880E+02 );
+        lowCpCoeffs     ( -7.70378430E+00  1.36474710E-01 -3.29056550E-04  3.81504780E-07 -1.63102850E-10 -9.67365721E+04  2.52920850E+01 );
+        
+
+        Cp $Cp;
+        Hf -5168.30131333e3;
+    }
+    transport
+    {
+        mu          1e-7;
+        Pr          8.0e-6;
+    }
+    equationOfState
+    {
+        rho         $rho_ox;
+    }
+}
+
+
+FeO
+{
+    specie
+    {
+        molWeight   $MW_FeO;
+    }
+    thermodynamics // [McBride et al. 1993, p.58]
+    {
+        Tlow            300;
+        Thigh           1650;
+        Tcommon         1000;
+        highCpCoeffs    (  5.83164890E+00  1.42751560E-03 -9.32081430E-08 -6.59977630E-12 -2.25121430E-14 -3.45669020E+04 -2.64469900E+01 );
+        lowCpCoeffs     (  5.31954750E+00  2.20965910E-03  1.07217750E-06 -2.79297290E-09  1.33207330E-12 -3.44071650E+04 -2.36860340E+01 );
+
+        Cp $Cp;
+        Hf -3786.47472238e3;
+    }
+    transport
+    {
+        mu          1e-7;
+        Pr          8.0e-6;
+    }
+    equationOfState
+    {
+        rho         $rho_FeO;
+    }
+}
+
+inerts // TiO2
+{
+    specie
+    {
+        molWeight   79.865;
+    }
+    thermodynamics // [McBride et al. 1993, p.71]
+    {
+        Tlow            300;
+        Thigh           2130;
+        Tcommon         1000;
+        highCpCoeffs    (  6.84891510E+00 4.24634610E-03 -3.00889840E-06 1.06025190E-09 -1.43795970E-13 -1.15992460E+05 -3.45141060E+01 );
+        lowCpCoeffs     ( -1.61175170E-01 3.79666600E-02 -6.51547500E-05 5.25521360E-08 -1.62000510E-11 -1.14788970E+05 -1.88740350E+00 );
+
+        Cp $Cp;
+        Hf -11829.5195025e3;
+    }
+    transport
+    {
+        mu          1e-7;
+        Pr          8.0e-6;
+    }
+    equationOfState
+    {
+        rho         $rho_ox;
+    }
+}
+
+// ************************************************************************* //
