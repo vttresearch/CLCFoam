@@ -139,8 +139,8 @@ solvers
 PIMPLE
 {
     nOuterCorrectors         5;    // Amount of outer corrections
-    nCorrectors              1;    // Amount of inner corrections
-    nNonOrthogonalCorrectors 1;    // Amount of non-orthogonal corrections
+    nCorrectors              2;    // Amount of inner corrections
+    nNonOrthogonalCorrectors 3;    // Amount of non-orthogonal corrections
     nEnergyCorrectors        1;    // Amount of energy equation solves
 
 
