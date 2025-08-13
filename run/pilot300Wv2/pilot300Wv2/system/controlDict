@@ -36,7 +36,7 @@ deltaT          1e-05;
 
 writeControl    adjustableRunTime;
 
-writeInterval   10;
+writeInterval   1;
 
 purgeWrite      0;
 
@@ -63,6 +63,7 @@ functions
     // It might also make sense to add NRR for all cellSets
 
     #includeFunc moleFractions(phase=gas)
+    #includeFunc CourantNo
     #includeFunc frequentWriteFn
     // #includeFunc volIntegrateAlphaSolidsFn // Total volume of solids [m^3] - should be constant
     #includeFunc volIntegrate(writeInterval=100,fields=(alpha.solids))
@@ -157,6 +158,88 @@ functions
     #includeFunc volAverage(writeInterval=100,select=cellSet,cellSet=controlVolume_AR,weightFields=(rho.solids alpha.solids),fields=(T.solids))
     #includeFunc volAverage(writeInterval=100,select=cellSet,cellSet=controlVolume_FR,weightFields=(rho.solids alpha.solids),fields=(T.solids))
     
+    // -------------------------------------------------------------------------
+    // Field averaging (after statistically steady state is reached)
+    // taken from pseudoTwoDimensionalBed
+    // ---=== Calculation of fields for averaging ===---
+    // Granular pressure gradient
+    #includeFunc calcSolidsPressureFn(executeControl=timeStep,executeInterval=1)
+    
+    // Cell phase density [kg/m^3]
+    #includeFunc multiply(executeControl=timeStep,executeInterval=1,writeControl=none,fields=(alpha.gas rho.gas))
+    #includeFunc multiply(executeControl=timeStep,executeInterval=1,writeControl=none,fields=(alpha.solids rho.solids))
+    // Divergence of stress tensor [kg/m^2/s^2]
+    #includeFunc calcDivDevTauFn(executeControl=timeStep,executeInterval=1,phase=gas)
+    #includeFunc calcDivDevTauFn(executeControl=timeStep,executeInterval=1,phase=solids)
+    // Drag force [N]
+    #includeFunc phaseForces(executeControl=timeStep,executeInterval=1,phase=solids)
+    // Specie phase density [kg/m^3]
+    #includeFunc multiply(executeControl=timeStep,executeInterval=1,writeControl=none,fields=(alpha.solids rho.solids Fe2O3.solids))
+    #includeFunc multiply(executeControl=timeStep,executeInterval=1,writeControl=none,fields=(alpha.solids rho.solids FeO.solids))
+    #includeFunc multiply(executeControl=timeStep,executeInterval=1,writeControl=none,fields=(alpha.solids rho.solids inerts.solids))
+    #includeFunc multiply(executeControl=timeStep,executeInterval=1,writeControl=none,fields=(alpha.gas rho.gas CO.gas))
+    #includeFunc multiply(executeControl=timeStep,executeInterval=1,writeControl=none,fields=(alpha.gas rho.gas CO2.gas))
+    #includeFunc multiply(executeControl=timeStep,executeInterval=1,writeControl=none,fields=(alpha.gas rho.gas H2O.gas))
+    #includeFunc multiply(executeControl=timeStep,executeInterval=1,writeControl=none,fields=(alpha.gas rho.gas H2.gas))
+    #includeFunc multiply(executeControl=timeStep,executeInterval=1,writeControl=none,fields=(alpha.gas rho.gas CH4.gas))
+    // ---===========================================---
+
+    // Averaged phase densities [-]
+    #includeFunc fieldAverage(fields=(
+        multiply(alpha.gas,rho.gas)
+        multiply(alpha.solids,rho.solids)
+        ))
+    // Favre-averaged gas velocity (mean and prime2mean) [kg/s/m^2]
+    #includeFunc weightedAverageGasFn
+    // Favre-averaged solids velocity (mean and prime2mean) [kg/s/m^2]
+    #includeFunc weightedAverageSolidsFn
+    // Averaged volume fractions [-]
+    #includeFunc fieldAverage(fields=(alpha.gas alpha.solids))
+    // Averaged pressure [Pa]
+    #includeFunc fieldAverage(fields=(p),prime2Mean=yes)
+    // Averaged net reaction rates [mol/m^3/s] - needs to be converted to kg/m^3/s
+    #includeFunc fieldAverage(fields=(NRR_Abad_CH4 NRR_Abad_CO NRR_Abad_H2))
+    // Averaged drag force [N/m^3]
+    #includeFunc fieldAverage(fields=(dragForce.solids))
+    // // Solids (granular) pressure [Pa/m]
+    #includeFunc fieldAverage(fields=(p.solids))
+    // Stress terms (laminar and turbulent combined)
+    #includeFunc fieldAverage(fields=(divDevTau.gas))
+    #includeFunc fieldAverage(fields=(divDevTau.solids))
+    
+    // Pressure-volume fraction fluctuation 
+    #includeFunc grad(executeControl=timeStep,executeInterval=1,writeControl=none,field=p)
+    #includeFunc fieldAverage(fields=(grad(p)))
+    //      note: I believe, these should not be stated at t=0s
+    //      note: Also, only one phase is needed, other is equal to negative first
+    #includeFunc calcAlphaStrokeGradPStrokeFn(executeControl=timeStep,executeInterval=1,phase=gas,startTime=170) // NOTE: manually modify time on this and on the next line!
+    #includeFunc fieldAverage(fields=(alphaStrokeGradPStroke.gas),startTime=170)
+    
+    // Averaged species' phase densities
+    #includeFunc fieldAverage(fields=(
+        multiply(alpha.solids,rho.solids,Fe2O3.solids)
+        multiply(alpha.solids,rho.solids,FeO.solids)
+        multiply(alpha.solids,rho.solids,inerts.solids)
+        ))
+    #includeFunc fieldAverage(fields=(
+        multiply(alpha.gas,rho.gas,CO.gas)
+        multiply(alpha.gas,rho.gas,CO2.gas)
+        multiply(alpha.gas,rho.gas,H2O.gas)
+        multiply(alpha.gas,rho.gas,H2.gas)
+        multiply(alpha.gas,rho.gas,CH4.gas)
+        ))
+    // Averaged mass fractions
+    #includeFunc fieldAverage(fields=(Fe2O3.solids FeO.solids inerts.solids))
+    #includeFunc fieldAverage(fields=(CO.gas CO2.gas H2O.gas H2.gas CH4.gas))
+
+    // Averaged effective viscosity [m^2/s]
+    #includeFunc fieldAverage(fields=(nut.solids))
+    // Averaged frictional viscosity [m^2/s]
+    #includeFunc fieldAverage(fields=(kineticTheory:nuFric.solids))
+
+    // Velocities
+    #includeFunc fieldAverage(fields=(U.gas U.solids),prime2Mean=yes)
+
 }
 
 
