@@ -306,7 +306,10 @@ void Foam::fv::HeterogeneousShrinkingCoreChemistry::correct()
     conversion_ = 
         min(
             max(
-                Yox/(Yox+rho_ratio_*Yred),
+                // There were crashes due to numerical issues causing Y_inerts
+                // to go to 1 in a cell with alpha.solids close to 0 and causing 
+                // division by zero.
+                Yox/max(Yox+rho_ratio_*Yred, SMALL),
                 dimensionedScalar(dimless,0)
             ), 
             dimensionedScalar(dimless,1)
