@@ -22,7 +22,8 @@ boundaryField
 {
     wall
     {
-        type            zeroGradient;
+        type            fixedValue;
+        value           uniform ${${FOAM_CASE}/caseDict!T};
     }
     "inlet.*"
     {
