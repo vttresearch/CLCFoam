@@ -18,7 +18,7 @@ FoamFile
 // Which of the steps to run
 castellatedMesh true;//
 snap            true;//
-addLayers       false;//
+addLayers       true;//
 
 
 // Geometry.
@@ -40,6 +40,34 @@ geometry
         type triSurfaceMesh;
         name inlet_AR;
         file "inlet_AR.stl";
+    }
+
+    inlet_SL
+    {
+        type triSurfaceMesh;
+        name inlet_SL;
+        file "inlet_SL.stl";
+    }
+
+    inlet_DC2
+    {
+        type triSurfaceMesh;
+        name inlet_DC2;
+        file "inlet_DC2.stl";
+    }
+
+    outlet_FR
+    {
+        type triSurfaceMesh;
+        name outlet_FR;
+        file "outlet_FR.stl";
+    }
+
+    outlet_AR
+    {
+        type triSurfaceMesh;
+        name outlet_AR;
+        file "outlet_AR.stl";
     }
 
     walls
@@ -121,6 +149,38 @@ castellatedMeshControls
                 type patch;
             }
         }
+        inlet_SL
+        {
+            level (0 0);
+            patchInfo
+            {
+                type patch;
+            }
+        }
+        inlet_DC2
+        {
+            level (0 0);
+            patchInfo
+            {
+                type patch;
+            }
+        }
+        outlet_AR
+        {
+            level (0 0);
+            patchInfo
+            {
+                type patch;
+            }
+        }
+        outlet_FR
+        {
+            level (0 0);
+            patchInfo
+            {
+                type patch;
+            }
+        }
         walls
         {
             // Surface-wise min and max refinement level
@@ -165,7 +225,7 @@ castellatedMeshControls
         refinementSlot
         {
             mode inside;
-            levels (( 0.02 4 )); 
+            levels (( 0.02 3 )); 
         }
     }
 
@@ -173,6 +233,7 @@ castellatedMeshControls
     // Mesh selection
     // ~~~~~~~~~~~~~~
     insidePoint (-0.0305113 0.1007112 0.0075411125); // Inside point
+    // insidePoint (-0.02501 0.3601 0.0601); // Inside point
     
     // Whether any faceZones (as specified in the refinementSurfaces)
     // are only on the boundary of corresponding cellZones or also allow
@@ -241,20 +302,20 @@ addLayersControls
     // Per final patch (so not geometry!) the layer information
     layers
     {
-          "wall.*"
+        walls
         {
-            nSurfaceLayers 2;
+            nSurfaceLayers 4;
         } 
     }
 
     // Expansion factor for layer mesh
-    expansionRatio 2.;
+    expansionRatio 1.2;
 
 
     // Wanted thickness of final added cell layer. If multiple layers
     // is the thickness of the layer furthest away from the wall.
     // See relativeSizes parameter.
-    finalLayerThickness 0.5;
+    finalLayerThickness 0.6;
 
     // Minimum thickness of cell layer. If for any reason layer
     // cannot be above minThickness do not add layer.

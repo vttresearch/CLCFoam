@@ -1,0 +1,266 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    object      topoSetDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+configControlVolume {
+    includeCut false;
+    useSurfaceOrientation true;
+    includeInside   true;
+    includeOutside  false;
+    nearDistance    2e-5;
+    curvature       -1.;
+}
+
+actions
+(
+    // Fluidization sources
+    {
+        action  new;
+        type    cellSet;
+        name    inlet_DC;
+        source  cylinderToCell;
+        point1  (-0.0065 0.05 0.025);
+        point2  (-0.0065 0.05 0);
+        radius  0.0035;
+    }
+
+    // Solids loading
+    {
+        action  new;
+        type    cellZoneSet;
+        name    solids_loading;
+        source  boxToCell;
+        box     (-0.1 -0.1 -0.1) 
+                ( 0.1  0.2  0.1);
+    }
+
+    // Control surfaces
+    {
+        action  new;
+        type    faceSet;
+        name    controlSurface_SL_AR;
+        source  boxToFace;
+        box     (-0.00751  0.00105 -0.00001) 
+                (-0.00149  0.00115  0.02501);
+    }
+    {
+        name    controlSurface_SL_AR;
+        type    faceZoneSet;
+        action  new;
+        source  setAndNormalToFaceZone;
+        faceSet controlSurface_SL_AR;
+        normal  (0 1 0);
+    }
+    {
+        action  new;
+        type    faceSet;
+        name    controlSurface_SL_FR;
+        source  boxToFace;
+        box     (-0.00001  0.00105 -0.00001) 
+                ( 0.00451  0.00116  0.02501);
+    }
+    {
+        name    controlSurface_SL_FR;
+        type    faceZoneSet;
+        action  new;
+        source  setAndNormalToFaceZone;
+        faceSet controlSurface_SL_FR;
+        normal  (0 1 0);
+    }
+    // for kN3
+    {
+        action  new;
+        type    faceSet;
+        name    controlSurface_DC_AR;
+        source  boxToFace; // triSurface
+        box     (-0.019 0.1845 0.012) 
+                (-0.017 0.185 0.0251);
+    }
+    {
+        action  add;
+        type    faceSet;
+        name    controlSurface_DC_AR;
+        source  boxToFace; // triSurface
+        box     (-0.017  0.1844 0.012) 
+                (-0.0155 0.18494 0.0251);
+    }
+    {
+        action  add;
+        type    faceSet;
+        name    controlSurface_DC_AR;
+        source  boxToFace; // triSurface
+        box     (-0.0155 0.18435 0.012) 
+                (-0.013  0.18475 0.0251);
+    }
+    {
+        action  add;
+        type    faceSet;
+        name    controlSurface_DC_AR;
+        source  boxToFace; // triSurface
+        box     (-0.013  0.1843 0.012) 
+                (-0.001  0.1847 0.0251);
+    }
+    // {
+    //     action  new;
+    //     type    faceSet;
+    //     name    controlSurface_DC_AR;
+    //     source  boxToFace; // triSurface
+    //     // box     (-0.019  0.1842 0.012) 
+    //     //         (-0.001  0.1851 0.0251); // kN=3
+    //     box     (-0.019  0.1849 0.012) 
+    //             (-0.001  0.1863 0.0251); // kN=2
+    // }
+    {
+        name    controlSurface_DC_AR;
+        type    faceZoneSet;
+        action  new;
+        source  setAndNormalToFaceZone;
+        faceSet controlSurface_DC_AR;
+        normal  (0 1 0);
+    }
+    {
+        action  new;
+        type    faceSet;
+        name    controlSurface_DC_FR;
+        source  boxToFace;
+        box     (-0.00001 0.11999 -0.00001) 
+                // ( 0.00021 0.18501  0.01126);
+                ( 0.00021 0.18501  0.0089);
+    }
+    {
+        action  add;
+        type    faceSet;
+        name    controlSurface_DC_FR;
+        source  boxToFace;
+        box     (-0.0001 0.11999  0.0103) 
+                ( 0.0009 0.18501  0.01126);
+    }
+    {
+        action  add;
+        type    faceSet;
+        name    controlSurface_DC_FR;
+        source  boxToFace;
+        box     ( 0.0002 0.136  0.009) 
+                ( 0.0013 0.172  0.011);
+    }
+    {
+        action  add;
+        type    faceSet;
+        name    controlSurface_DC_FR;
+        source  boxToFace;
+        box     ( 0.0006 0.138  0.008) 
+                ( 0.0015 0.17  0.01);
+    }
+    {
+        action  add;
+        type    faceSet;
+        name    controlSurface_DC_FR;
+        source  boxToFace;
+        box     ( 0.0003 0.138  0.0065) 
+                ( 0.0012 0.17   0.008);
+    }
+    {
+        action  add;
+        type    faceSet;
+        name    controlSurface_DC_FR;
+        source  boxToFace;
+        box     ( -0.0003 0.12  0.009) 
+                ( 0.0006 0.122   0.0098);
+    }
+    {
+        action  add;
+        type    faceSet;
+        name    controlSurface_DC_FR;
+        source  boxToFace;
+        box     ( -0.0005 0.182  0.0081) 
+                ( 0.0007  0.185  0.0099);
+    }
+    {
+        action  add;
+        type    faceSet;
+        name    controlSurface_DC_FR;
+        source  boxToFace;
+        box     ( 0.0001 0.1695 0.0065) 
+                ( 0.0011 0.1725 0.0090);
+    }
+    {
+        action  add;
+        type    faceSet;
+        name    controlSurface_DC_FR;
+        source  boxToFace;
+        box     ( 0.0001 0.136 0.0065) 
+                ( 0.0011 0.137 0.0090);
+    }
+    
+    {
+        name    controlSurface_DC_FR;
+        type    faceZoneSet;
+        action  new;
+        source  setAndNormalToFaceZone;
+        faceSet controlSurface_DC_FR;
+        normal  (1 0 0);
+    }
+
+    // Control volumes
+    {
+        name    controlVolume_SL;
+        type    cellSet;
+        action  new;
+        source  surfaceToCell;
+        sourceInfo
+        {
+            file    "constant/triSurface/controlVolume_SL.stl";
+            outsidePoints ((0.02 0.4 0.01));
+            $configControlVolume
+        }
+    }
+    {
+        name    controlVolume_DC;
+        type    cellSet;
+        action  new;
+        source  surfaceToCell;
+        sourceInfo
+        {
+            file    "constant/triSurface/controlVolume_DC.stl";
+            outsidePoints ((0.02 0.4 0.01));
+            $configControlVolume
+        }
+    }
+    {
+        name    controlVolume_AR;
+        type    cellSet;
+        action  new;
+        source  surfaceToCell;
+        sourceInfo
+        {
+            file    "constant/triSurface/controlVolume_AR.stl";
+            outsidePoints ((0.02 0.4 0.01));
+            $configControlVolume
+        }
+    }
+    {
+        name    controlVolume_FR;
+        type    cellSet;
+        action  new;
+        source  surfaceToCell;
+        sourceInfo
+        {
+            file    "constant/triSurface/controlVolume_FR.stl";
+            outsidePoints ((-0.02 0.4 0.01));
+            $configControlVolume
+        }
+    }
+);
+
+// ************************************************************************* //

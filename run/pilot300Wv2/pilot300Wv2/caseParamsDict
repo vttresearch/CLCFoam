@@ -29,13 +29,14 @@ VM_NTP  #calc " $R * $T_NTP / $p_NTP "; // [m^3/mol]
 // ------------=== Parameters to modify ===-------------
 
 simulationType      fresh;
+kN                  4; // [-]    - mesh resolution factor
 chemistry           act;        // - name of the chemistry model (pre/act)
 solidsMass          0.270;      // [kg]   - total mass of solids
 domainVolume        0.001629840205;  // [m^3]  - total volume of the domain (foamPostProcess -solver multiphaseEuler -func "volIntegrate(fields=(H2O.gas))" -time 0)
 initialBedVolume    0.0002798144792; // [m^3]  - volume of solids_loading set, calc with foamPostProcess -func calcVolumeOfSet
 particleD           152.5e-6;   // [m]    - diameter of ilmenite particle (fresh=152.5e-6, used31h=182e-6, used85h=161e-6)        
 initialConversion   0.96;       // [-]    - 0 - fully reduced, 1 - fully oxidized
-T                   1173.15;    // [K]    - temperature (900°C)
+T                   1153.15;    // [K]    - temperature (880°C)
 rhoOxidized         3000;       // [kg/m^3] - density of fully oxidized state
 
 // ------------=== Gas compositions ===-------------

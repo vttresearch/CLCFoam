@@ -29,7 +29,7 @@ y1 #calc " 0.4399 + $delta";
 z0 #calc "-0.    - $delta";
 z1 #calc " 0.11  + $delta";
 
-kN 3;
+kN ${${FOAM_CASE}/caseParamsDict!kN};
 // Nx #calc "$kN * 7";
 // Ny #calc "$kN * 45";
 // Nz #calc "$kN * 11";

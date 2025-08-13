@@ -3,16 +3,17 @@
 surfaceFeatures | tee log.surfaceFeatures #&& surfaceFeatureConvert constant/triSurface/all.eMesh constant/triSurface/all.obj
 blockMesh
 decomposePar
-NPROCS=$(foamDictionary -entry numberOfSubdomains -value system/decomposeParDict)
+NPROCS=$(foamDictionary -entry numberOfSubdomains -value system/decomposeParDict | tail -n 1)
+kN=$(foamDictionary -expand -entry kN -value caseParamsDict | tail -n 1)
 mpirun -np $NPROCS snappyHexMesh -parallel -overwrite | tee log.snappyHexMesh
 reconstructPar
 rm -r processor*
-topoSet | tee log.topoSet0
-checkMesh | tee log.checkMesh
+# topoSet | tee log.topoSet0
+checkMesh -allTopology | tee log.checkMesh
 
-createPatch -overwrite
+# createPatch -overwrite
 renumberMesh -overwrite
-topoSet | tee log.topoSet
+topoSet -dict "system/topoSetDict_kN${kN}" | tee log.topoSet
 
 N_CV_SL=$(sed -n 's/.*cellSet controlVolume_SL now size \([0-9]\+\)/\1/p' log.topoSet | head -n 1)
 N_CV_DC=$(sed -n 's/.*cellSet controlVolume_DC now size \([0-9]\+\)/\1/p' log.topoSet | head -n 1)
@@ -21,8 +22,8 @@ N_CV_FR=$(sed -n 's/.*cellSet controlVolume_FR now size \([0-9]\+\)/\1/p' log.to
 N_CV_tot=$((N_CV_SL+N_CV_DC+N_CV_AR+N_CV_FR))
 N_cells=$(sed -n 's/.*cells: *\([0-9]\+\)/\1/p' log.checkMesh)
 
-N_outlet_AR=$(sed -n 's/.*faceSet outlet_AR now size \([0-9]\+\)/\1/p' log.topoSet | head -n 1)
-N_outlet_FR=$(sed -n 's/.*faceSet outlet_FR now size \([0-9]\+\)/\1/p' log.topoSet | head -n 1)
+# N_outlet_AR=$(sed -n 's/.*faceSet outlet_AR now size \([0-9]\+\)/\1/p' log.topoSet | head -n 1)
+# N_outlet_FR=$(sed -n 's/.*faceSet outlet_FR now size \([0-9]\+\)/\1/p' log.topoSet | head -n 1)
 N_FS_SL_AR=$(sed -n 's/.*faceSet controlSurface_SL_AR now size \([0-9]\+\)/\1/p' log.topoSet | head -n 1)
 N_FS_SL_FR=$(sed -n 's/.*faceSet controlSurface_SL_FR now size \([0-9]\+\)/\1/p' log.topoSet | head -n 1)
 N_FS_DC_AR=$(sed -n 's/.*faceSet controlSurface_DC_AR now size \([0-9]\+\)/\1/p' log.topoSet | head -n 1)
@@ -30,14 +31,14 @@ N_FS_DC_FR=$(sed -n 's/.*faceSet controlSurface_DC_FR now size \([0-9]\+\)/\1/p'
 
 # inlet AR = 22x15
 # inlet FR = 11x15
-if [ "$N_outlet_AR" -ne "$((26*13))" ]; then
-  echo "WARNING! Number of faces in outlet_AR patch $N_outlet_AR is not correct $((26*13))"
-  sleep 5
-fi
-if [ "$N_outlet_FR" -ne "$((15*13))" ]; then
-  echo "WARNING! Number of faces in outlet_FR patch $N_outlet_FR is not correct $((15*13))"
-  sleep 5
-fi
+# if [ "$N_outlet_AR" -ne "$((26*13))" ]; then
+#   echo "WARNING! Number of faces in outlet_AR patch $N_outlet_AR is not correct $((26*13))"
+#   sleep 5
+# fi
+# if [ "$N_outlet_FR" -ne "$((15*13))" ]; then
+#   echo "WARNING! Number of faces in outlet_FR patch $N_outlet_FR is not correct $((15*13))"
+#   sleep 5
+# fi
 if [ "$N_FS_SL_AR" -ne "$((29*120))" ]; then
   echo "WARNING! Number of faces in SL_AR control surface $N_FS_SL_AR is not correct $((29*120))"
   sleep 5
