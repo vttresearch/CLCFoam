@@ -60,8 +60,9 @@ def read_fo_df(case_path, fo_name, file_name, time:str|list[str], ignore_index=F
         file_path = join(case_path, 'postProcessing', fo_name, time[i], file_name)
         next_df = pd.read_csv(file_path, **kwargs)
         if not df.index[-1] <= next_df.index[0]:
-            print(f"Warning: trimming {file_name} at time {time[i]}")
-            next_df = next_df[next_df.index > df.index[-1]]
+            # print(f"Warning: trimming {file_name} at time {time[i]}")
+            # next_df = next_df[next_df.index > df.index[-1]]
+            df = df[df.index <= next_df.index[0]]
         df = pd.concat([df, next_df], ignore_index=ignore_index)
     return df
 
