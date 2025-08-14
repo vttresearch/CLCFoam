@@ -29,3 +29,7 @@ cp "${plabr}labReactor_sensitivity_mesh_T_vs_t.pdf"              "${pres}Figure_
 cp "${plabr}labReactor_sensitivity_mesh_gamma_vs_omega.pdf"      "${pres}Figure_B2b.pdf"
 cp "${plabr}labReactor_sensitivity_density_bed_height_vs_t.pdf"  "${pres}Figure_B3a.pdf"
 cp "${plabr}labReactor_sensitivity_density_gamma_vs_omega.pdf"   "${pres}Figure_B3b.pdf"
+
+cp "${ppilot}pilot300W_mesh_sensitivity_circulation.pdf"         "${pres}Figure_D1.pdf"
+cp "${ppilot}pilot300W_mesh_sensitivity_temperature.pdf"         "${pres}Figure_D2.pdf"
+cp "${ppilot}pilot300W_mesh_sensitivity_efficiency.pdf"          "${pres}Figure_D3.pdf"
