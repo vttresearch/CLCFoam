@@ -24,21 +24,23 @@ These folders contain validation data from the literature and python post-proces
 
 ## References
 
-<a id="1">[1]</a>  I. Morev,  J. Kapanen,  J. Peltola, S. Kallio, Coupling of shrinking core and Eulerian-Eulerian models for chemical looping
-combustion, TBA, [DOI_TBA](https://doi.org/TBA) (TBA).
+<a id="1">[1]</a>  
+  Morev, Ilya, et al. “Coupling of Shrinking Core and Eulerian-Eulerian Models for Chemical Looping Combustion.” Chemical Engineering Science, 2026, p. 123431, [https://doi.org/10.1016/j.ces.2026.123431](https://doi.org/10.1016/j.ces.2026.123431).
+
 <details>
 <summary>BibTex</summary>
 <p>
  
 ```
-@article{morev2025Coupling,
+@article{morev2026Coupling,
   title={Coupling of shrinking core and Eulerian-Eulerian models for chemical looping
 combustion},
-  author={Morev, Ilya and Kapanen, Johanna and Peltola, Juho and Kallio, Sirpa},
-  journal={TBA},
-  pages={TBA},
-  year={TBA},
-  publisher={TBA}
+  author = {Ilya Morev and Johanna Kapanen and Juho Peltola and Sirpa Kallio},
+  journal = {Chemical Engineering Science},
+  pages = {123431},
+  year = {2026},
+  issn = {0009-2509},
+  doi = {https://doi.org/10.1016/j.ces.2026.123431}
 }
 ```
  
