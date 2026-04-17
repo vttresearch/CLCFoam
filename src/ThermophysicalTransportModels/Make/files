@@ -1,0 +1,4 @@
+phaseFluidMulticomponentThermo/CLCPhaseFluidMulticomponentThermophysicalTransportModels.C
+fluidMulticomponentThermo/CLCFluidMulticomponentThermophysicalTransportModels.C
+
+LIB = $(FOAM_USER_LIBBIN)/libCLCFluidMulticomponentThermophysicalTransportModels
