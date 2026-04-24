@@ -1,0 +1,79 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+Description
+    Calculates deviatoric part of the velocity stress tensor for a phase
+
+\*---------------------------------------------------------------------------*/
+
+libs     ("libutilityFunctionObjects.so");
+type     coded;
+
+writeControl writeTime;
+
+phase <phase>;
+
+codeInclude
+#{
+    #include "fvc.H"
+    #include "phaseCompressibleMomentumTransportModel.H"
+#};
+
+codeOptions
+#{
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/functionObjects/field/lnInclude \
+    -I$(LIB_SRC)/physicalProperties/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
+    -I$(LIB_SRC)/MomentumTransportModels/momentumTransportModels/lnInclude \
+    -I$(LIB_SRC)/MomentumTransportModels/compressible/lnInclude \
+    -I$(LIB_SRC)/MomentumTransportModels/phaseCompressible/lnInclude
+#};
+
+codeLibs
+#{
+    -lphaseSystem
+#};
+
+codeData
+#{
+    word phaseName_;
+    word resultName_;
+#};
+
+codeRead
+#{
+    phaseName_ = dict.lookup<word>("phase");
+    resultName_ = IOobject::groupName("divDevTau", phaseName_);
+#};
+
+codeFields
+#{
+    fields.append(IOobject::groupName("U", phaseName_));
+    // NOT IMPLEMENTED
+#};
+
+codeExecute
+#{
+    volVectorField U = mesh().lookupObject<volVectorField>
+    (
+        IOobject::groupName("U", phaseName_)
+    );
+    const phaseCompressible::momentumTransportModel& turbulence_ = 
+        mesh().lookupType<phaseCompressible::momentumTransportModel>
+        (
+            phaseName_
+        );
+    store(resultName_, turbulence_.divDevTau(U) & U);
+#};
+
+codeWrite
+#{
+    return writeObject(resultName_);
+#};
+
+// ************************************************************************* //

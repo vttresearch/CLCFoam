@@ -1,0 +1,166 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+Description
+    Calculates a volScalarField of P.solids
+
+\*---------------------------------------------------------------------------*/
+
+libs     ("libutilityFunctionObjects.so");
+type     coded;
+
+writeControl writeTime;
+
+phase solids;
+resultName "p.solids";
+
+codeInclude
+#{
+    #include "fvc.H"
+    #include "phaseModel.H"
+    #include "momentumTransportModel.H"
+    #include "radialModel.H"
+    #include "granularPressureModel.H"
+    #include "frictionalStressModel.H"
+#};
+
+codeOptions
+#{
+    -I$(FOAM_MODULES)/multiphaseEuler/phaseSystem/lnInclude \
+    -I$(FOAM_MODULES)/multiphaseEuler/interfacialModels/lnInclude \
+    -I$(FOAM_MODULES)/multiphaseEuler/populationBalance/lnInclude \
+    -I$(FOAM_MODULES)/multiphaseEuler/momentumTransportModels/lnInclude \
+    -I$(FOAM_MODULES)/multiphaseEuler/thermophysicalTransportModels/lnInclude \
+    -I$(LIB_SRC)/fileFormats/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/sampling/lnInclude \
+    -I$(LIB_SRC)/functionObjects/field/lnInclude \
+    -I$(LIB_SRC)/physicalProperties/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
+    -I$(LIB_SRC)/twoPhaseModels/twoPhaseMixture/lnInclude \
+    -I$(LIB_SRC)/twoPhaseModels/compressibleTwoPhases/lnInclude \
+    -I$(LIB_SRC)/MomentumTransportModels/momentumTransportModels/lnInclude \
+    -I$(LIB_SRC)/MomentumTransportModels/compressible/lnInclude \
+    -I$(LIB_SRC)/MomentumTransportModels/phaseCompressible/lnInclude
+#};
+
+codeLibs
+#{
+    -lphaseSystem
+#};
+
+codeData
+#{
+    word phaseName_;
+    word resultName_;
+
+    //- Min value for which the frictional stresses are zero
+    dimensionedScalar alphaMinFriction_;
+
+    //- Coefficient of restitution
+    dimensionedScalar e_;
+
+    //- Run-time selected radial distribution model
+    autoPtr<kineticTheoryModels::radialModel> radialModel_;
+
+    //- Run-time selected granular pressure model
+    autoPtr<kineticTheoryModels::granularPressureModel>
+        granularPressureModel_;
+
+    //- Run-time selected granular pressure model
+    autoPtr<kineticTheoryModels::frictionalStressModel>
+        frictionalStressModel_;
+#};
+
+codeRead
+#{
+    phaseName_ = dict.lookup<word>("phase");
+    resultName_ = dict.lookup<word>("resultName");
+    
+    // idea from turbulenceIntensity.H
+    const momentumTransportModel& turbModel =
+            mesh().lookupType<momentumTransportModel>(phaseName_);
+    const dictionary& coeffDict = turbModel.coeffDict();
+
+    alphaMinFriction_ = dimensionedScalar
+        (
+            "alphaMinFriction", 
+            dimless, 
+            coeffDict
+        );
+    e_ = dimensionedScalar("e", dimless, coeffDict);
+
+    // from kineticTheoryModel.H
+    radialModel_ = kineticTheoryModels::radialModel::New(coeffDict);
+    granularPressureModel_ = kineticTheoryModels::granularPressureModel::New
+        (
+            coeffDict
+        );
+
+
+    frictionalStressModel_ = kineticTheoryModels::frictionalStressModel::New
+    (
+        coeffDict
+    );
+#};
+
+codeFields
+#{
+    // Read fields when executing function objects with "foamPostProcess"
+    fields.append(IOobject::groupName("alpha", phaseName_));
+    fields.append(IOobject::groupName("Theta", phaseName_));
+    // NOT IMPLEMENTED
+#};
+
+codeExecute
+#{
+    const phaseModel& phase
+    (
+        mesh().lookupObject<phaseModel>
+        (
+            IOobject::groupName("alpha", phaseName_)
+        )
+    );
+    const volScalarField& rho = phase.rho();
+    
+    const volScalarField& Theta = mesh().lookupObject<volScalarField>
+        (
+            IOobject::groupName("Theta", phaseName_)
+        );
+
+    const volScalarField PsCoeff
+    (
+        granularPressureModel_->granularPressureCoeff
+        (
+            phase,
+            radialModel_->g0(phase, alphaMinFriction_, phase.alphaMax()),
+            rho,
+            e_
+        )
+    );
+
+    // Frictional pressure
+    const volScalarField pf
+    (
+        frictionalStressModel_->frictionalPressure
+        (
+            phase,
+            alphaMinFriction_,
+            phase.alphaMax()
+        )
+    );
+
+    store(resultName_, PsCoeff*Theta + pf);
+#};
+
+codeWrite
+#{
+    return writeObject(resultName_);
+#};
+
+// ************************************************************************* //

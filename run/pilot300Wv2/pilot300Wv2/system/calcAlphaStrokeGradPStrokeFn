@@ -1,0 +1,95 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+Description
+    Calculates pressure-volume fraction fluctuation term for further averaging
+
+\*---------------------------------------------------------------------------*/
+
+libs     ("libutilityFunctionObjects.so");
+type     coded;
+
+writeControl writeTime;
+
+phase <phase>;
+resultName "alphaStrokeGradPStroke";
+
+codeInclude
+#{
+    #include "fvc.H"
+    #include "phaseCompressibleMomentumTransportModel.H"
+#};
+
+codeOptions
+#{
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/functionObjects/field/lnInclude \
+    -I$(LIB_SRC)/physicalProperties/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
+    -I$(LIB_SRC)/MomentumTransportModels/momentumTransportModels/lnInclude \
+    -I$(LIB_SRC)/MomentumTransportModels/compressible/lnInclude \
+    -I$(LIB_SRC)/MomentumTransportModels/phaseCompressible/lnInclude
+#};
+
+codeLibs
+#{
+    -lphaseSystem
+#};
+
+codeData
+#{
+    word resultName_;
+    word phaseName_;
+#};
+
+codeRead
+#{
+    phaseName_ = dict.lookup<word>("phase");
+    resultName_ = IOobject::groupName
+    (
+        dict.lookup<word>("resultName"), phaseName_
+    );
+#};
+
+codeFields
+#{
+    // fields.append(IOobject::groupName("alphaMean", phaseName_));
+    // fields.append("grad(p)Mean");
+    // fields.append(IOobject::groupName("alpha", phaseName_));
+    // fields.append("p");
+    // notImplemented
+#};
+
+codeExecute
+#{
+    const volScalarField& alphaMean = mesh().lookupObject<volScalarField>
+    (
+        IOobject::groupName("alphaMean", phaseName_)
+    );
+    const volVectorField& gradPMean = mesh().lookupObject<volVectorField>
+    (
+        "grad(p)Mean"
+    );
+    const volScalarField& alpha = mesh().lookupObject<volScalarField>
+    (
+        IOobject::groupName("alpha", phaseName_)
+    );
+    const volVectorField& gradp = mesh().lookupObject<volVectorField>
+    (
+        "grad(p)"
+    );
+    // const volScalarField& p = mesh().lookupObject<volScalarField>("p");
+    // store(resultName_, (alpha-alphaMean)*(fvc::grad(p)-gradPMean));
+    store(resultName_, (alpha-alphaMean)*(gradp-gradPMean));
+#};
+
+codeWrite
+#{
+    return writeObject(resultName_);
+#};
+
+// ************************************************************************* //

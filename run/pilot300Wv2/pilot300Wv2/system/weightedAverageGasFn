@@ -1,0 +1,29 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+Description
+    
+
+\*---------------------------------------------------------------------------*/
+
+type                fieldWeightedAverage;
+libs                ("libfieldWeightedAverageFunctionObject.so");
+writeControl        writeTime;
+weightFields        (alpha.gas rho.gas);
+
+fields
+(
+    U.gas
+    {
+        mean        on;
+        prime2Mean  on;
+        ext         favre;
+    }
+);
+
+
+// ************************************************************************* //
