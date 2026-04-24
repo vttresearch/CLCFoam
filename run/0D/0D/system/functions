@@ -1,0 +1,53 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      functions;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#includeFunc moleFractions(phase=gas,executeControl=timeStep)
+#includeFunc moleFractions(phase=solids,executeControl=timeStep)
+#includeFunc probesFn
+#includeFunc totalMassEnthalpyFn
+// Density of solids [kg/m^3]
+#includeFunc volIntegrateFn(fields=(rho.solids),operation=sum)
+// Mass of solids [kg]
+#includeFunc volIntegrateFn(fields=(rho.solids),weightField=alpha.solids)
+// Mass of gas [kg]
+#includeFunc volIntegrateFn(fields=(rho.gas),weightField=alpha.gas)
+// Mass of Fe2O3 part [kg]
+#includeFunc volIntegrateFn(fields=(Fe2O3.solids),weightFields=(alpha.solids rho.solids))
+// Mass of FeO part [kg]
+#includeFunc volIntegrateFn(fields=(FeO.solids),weightFields=(alpha.solids rho.solids))
+// Mass of inerts part [kg]
+#includeFunc volIntegrateFn(fields=(inerts.solids),weightFields=(alpha.solids rho.solids))
+// Mass of gaseous species [kg]
+#includeFunc volIntegrateFn(fields=(N2.gas),weightFields=(alpha.gas rho.gas))
+#includeFunc volIntegrateFn(fields=(O2.gas),weightFields=(alpha.gas rho.gas))
+#includeFunc volIntegrateFn(fields=(CO.gas),weightFields=(alpha.gas rho.gas))
+#includeFunc volIntegrateFn(fields=(CO2.gas),weightFields=(alpha.gas rho.gas))
+#includeFunc volIntegrateFn(fields=(H2O.gas),weightFields=(alpha.gas rho.gas))
+#includeFunc volIntegrateFn(fields=(H2.gas),weightFields=(alpha.gas rho.gas))
+#includeFunc volIntegrateFn(fields=(CH4.gas),weightFields=(alpha.gas rho.gas))
+// Internal energy of gas [J]
+#includeFunc volIntegrateFn(fields=(h.gas),weightFields=(alpha.gas rho.gas))
+// Enthalpy of solids [J]
+#includeFunc volIntegrateFn(fields=(h.solids),weightFields=(alpha.solids rho.solids))
+// Total reaction rates (solid reactant consumption rates) [mol/s]
+#includeFunc volIntegrateFn(fields=(NRR_Abad_H2))
+#includeFunc volIntegrateFn(fields=(NRR_Abad_CO))
+#includeFunc volIntegrateFn(fields=(NRR_Abad_CH4))
+#includeFunc volIntegrateFn(fields=(NRR_Abad_O2))
+
+
+// ************************************************************************* //
