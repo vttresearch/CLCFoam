@@ -1,0 +1,11 @@
+#!/bin/bash
+
+build_module() {
+    local module=$1
+    wclean "$module"
+    wmake "$module"
+}
+
+build_module src/fvModels/HeterogeneousShrinkingCoreChemistry
+build_module src/ThermophysicalTransportModels
+build_module src/applications/testThermo

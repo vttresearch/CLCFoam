@@ -1,0 +1,36 @@
+#!/bin/bash
+cd ${0%/*} || exit 1    # Run from this directory
+
+source "../../src/common/shellFunctions"
+
+folder_name=pilot300Wv2_test
+
+rm -rf "$folder_name"
+cp -r pilot300Wv2 "$folder_name"
+cd "$folder_name"
+
+    echo -n "setEndTime: "
+    foamDictionary -entry endTime -set 1e-4 system/controlDict > log.foamDictionary_setEndTime 2>&1 && echo "PASS" || echo "FAIL"
+
+    echo -n "setkN: "
+    foamDictionary -entry kN -set 1 caseParamsDict > log.foamDictionary_setkN 2>&1 && echo "PASS" || echo "FAIL"
+
+    echo -n "setNumberOfSubdomains: "
+    foamDictionary -entry numberOfSubdomains -set 4 system/decomposeParDict > log.foamDictionary_setNumberOfSubdomains 2>&1 && echo "PASS" || echo "FAIL"
+
+    echo -n "PrepareMesh: "
+    ./PrepareMesh > log.PrepareMesh 2>&1 && echo "PASS" || echo "FAIL"
+
+    echo -n "setICBC: "
+    setICBC > log.setICBC 2>&1 && echo "PASS" || echo "FAIL"
+
+    echo -n "setFields: "
+    setFields > log.setFields 2>&1 && echo "PASS" || echo "FAIL"
+
+    echo -n "foamDictionary: "
+    foamDictionary -expand caseDict > log.foamDictionary 2>&1 && echo "PASS" || echo "FAIL"
+
+    echo -n "foamRun: "
+    foamRun -solver multiphaseEuler > log.foamRun 2>&1 && echo "PASS" || echo "FAIL"
+
+cd ..

@@ -1,0 +1,20 @@
+#!/bin/bash
+cd ${0%/*} || exit 1    # Run from this directory
+
+echo "===== 0D Alltest ====="
+bash run/0D/Alltest
+
+echo
+echo "===== labReactor Alltest ====="
+bash run/labReactor/Alltest
+
+echo
+echo "===== pilot300Wv2 Alltest ====="
+bash run/pilot300Wv2/Alltest
+
+echo
+echo "===== testThermo ====="
+testThermo gas H2O -case run/0D/0D_act_CH4/ > log.testThermo 2>&1 && echo "PASS" || echo "FAIL"
+
+echo
+echo "All tests finished."
