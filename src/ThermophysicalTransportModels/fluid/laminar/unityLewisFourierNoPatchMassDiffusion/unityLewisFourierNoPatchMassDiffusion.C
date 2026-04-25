@@ -138,6 +138,23 @@ unityLewisFourierNoPatchMassDiffusion<BasicThermophysicalTransportModel>::q() co
 
 
 template<class BasicThermophysicalTransportModel>
+tmp<scalarField>
+unityLewisFourierNoPatchMassDiffusion<BasicThermophysicalTransportModel>::q
+(
+    const label patchi
+) const
+{
+    return
+      - (
+            this->alpha().boundaryField()[patchi]
+           *this->thermo().kappa().boundaryField()[patchi]
+           /this->thermo().Cpv()[patchi]
+           *this->thermo().he().boundaryField()[patchi].snGrad()
+        );
+}
+
+
+template<class BasicThermophysicalTransportModel>
 tmp<fvScalarMatrix>
 unityLewisFourierNoPatchMassDiffusion<BasicThermophysicalTransportModel>::
 divq(volScalarField& he) const
@@ -211,6 +228,33 @@ tmp<surfaceScalarField>unityLewisFourierNoPatchMassDiffusion<BasicThermophysical
         ),
        -fvc::interpolate(this->alpha()*dEff)
        *fvc::snGrad(Yi)
+    );
+}
+
+
+template<class BasicThermophysicalTransportModel>
+tmp<scalarField>
+unityLewisFourierNoPatchMassDiffusion<BasicThermophysicalTransportModel>::j
+(
+    const volScalarField& Yi,
+    const label patchi
+) const
+{
+    const fvPatch& patch = Yi.mesh().boundary()[patchi];
+
+    if (patch.coupled() || patch.type() == "wall")
+    {
+        return
+          - (
+                this->alpha().boundaryField()[patchi]
+               *this->DEff(Yi, patchi)
+               *Yi.boundaryField()[patchi].snGrad()
+            );
+    }
+
+    return tmp<scalarField>
+    (
+        new scalarField(patch.size(), scalar(0))
     );
 }
 

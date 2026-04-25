@@ -197,11 +197,21 @@ public:
         //- Return the heat flux [W/m^2]
         virtual tmp<surfaceScalarField> q() const override;
 
+        //- Return the patch heat flux [W/m^2]
+        virtual tmp<scalarField> q(const label patchi) const override;
+
         //- Return the source term for the energy equation
         virtual tmp<fvScalarMatrix> divq(volScalarField& he) const override;
 
         //- Return the specie flux for the given specie mass-fraction [kg/m^2/s]
         virtual tmp<surfaceScalarField> j(const volScalarField& Yi) const override;
+
+        //- Return the patch specie flux for the given specie mass-fraction
+        virtual tmp<scalarField> j
+        (
+            const volScalarField& Yi,
+            const label patchi
+        ) const override;
 
         //- Return the source term for the given specie mass-fraction equation
         virtual tmp<fvScalarMatrix> divj(volScalarField& Yi) const override;

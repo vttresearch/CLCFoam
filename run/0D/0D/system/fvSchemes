@@ -106,9 +106,11 @@ laplacianSchemes
 
     // For T!=const solids
         laplacian((alpha.solids*((kappa.solids|Cp.solids)+alphat.solids)),h.solids) Gauss linear limited 0.5;
+        laplacian((alpha.solids*alphaEff),h.solids) Gauss linear limited 0.5;
 
     // For gas energy=sensibleEnthalpy
     laplacian((alpha.gas*alphahe),h.gas)        Gauss linear limited 0.5;
+    laplacian((alpha.gas*alphaEff),h.gas)       Gauss linear limited 0.5;
 
     // After TASIFNG-319530d58679 (31 August 2023)
     laplacian(rAf,p_rgh)                        Gauss linear limited 0.5;

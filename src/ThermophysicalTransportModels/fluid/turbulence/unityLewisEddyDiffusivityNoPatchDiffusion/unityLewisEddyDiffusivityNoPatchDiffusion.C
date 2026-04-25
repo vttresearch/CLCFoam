@@ -184,6 +184,32 @@ unityLewisEddyDiffusivityNoPatchDiffusion<TurbulenceThermophysicalTransportModel
 
 
 template<class TurbulenceThermophysicalTransportModel>
+tmp<scalarField>
+unityLewisEddyDiffusivityNoPatchDiffusion<TurbulenceThermophysicalTransportModel>::q
+(
+    const label patchi
+) const
+{
+    const fvPatch& patch = this->thermo().mesh().boundary()[patchi];
+
+    if (patch.coupled() || patch.type() == "wall")
+    {
+        return
+          - (
+                this->alpha().boundaryField()[patchi]
+               *this->alphaEff(patchi)
+               *this->thermo().he().boundaryField()[patchi].snGrad()
+            );
+    }
+
+    return tmp<scalarField>
+    (
+        new scalarField(patch.size(), scalar(0))
+    );
+}
+
+
+template<class TurbulenceThermophysicalTransportModel>
 tmp<fvScalarMatrix>
 unityLewisEddyDiffusivityNoPatchDiffusion<TurbulenceThermophysicalTransportModel>::divq
 (
@@ -249,6 +275,33 @@ unityLewisEddyDiffusivityNoPatchDiffusion<TurbulenceThermophysicalTransportModel
         ),
        -fvc::interpolate(this->alpha()*dEff)
        *fvc::snGrad(Yi)
+    );
+}
+
+
+template<class TurbulenceThermophysicalTransportModel>
+tmp<scalarField>
+unityLewisEddyDiffusivityNoPatchDiffusion<TurbulenceThermophysicalTransportModel>::j
+(
+    const volScalarField& Yi,
+    const label patchi
+) const
+{
+    const fvPatch& patch = Yi.mesh().boundary()[patchi];
+
+    if (patch.coupled() || patch.type() == "wall")
+    {
+        return
+          - (
+                this->alpha().boundaryField()[patchi]
+               *this->DEff(Yi, patchi)
+               *Yi.boundaryField()[patchi].snGrad()
+            );
+    }
+
+    return tmp<scalarField>
+    (
+        new scalarField(patch.size(), scalar(0))
     );
 }
 
