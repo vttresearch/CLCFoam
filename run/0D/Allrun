@@ -16,6 +16,7 @@ for chemistryi in {0..1}; do
         gas=${gases[$gasi]}
         folder_name=0D_${chemistry}_${gas}
         cp -r 0D $folder_name
+        rm -rf "$folder_name/dynamicCode"
         cd $folder_name
 
             setParameter gas $gas

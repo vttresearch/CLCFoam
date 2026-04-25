@@ -8,6 +8,7 @@ simTime=5
 gas=CH4
 folder_name=0D_${chemistry}_${gas}
 cp -r 0D $folder_name
+rm -rf "$folder_name/dynamicCode"
 cd $folder_name
 
     echo -n "setParameter: "

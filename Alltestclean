@@ -2,13 +2,13 @@
 cd ${0%/*} || exit 1    # Run from this directory
 
 echo "Cleaning 0D test data..."
-bash 0D/Allclean || true
+bash run/0D/Allclean || true
 
 echo "Cleaning labReactor test data..."
-rm -rf labReactor/labReactor_test
+rm -rf run/labReactor/labReactor_test
 
 echo "Cleaning pilot300Wv2 test data..."
-rm -rf pilot300Wv2/pilot300Wv2_test
+rm -rf run/pilot300Wv2/pilot300Wv2_test
 
 echo "Cleaning testThermo test data..."
 rm log.testThermo || true

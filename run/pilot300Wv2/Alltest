@@ -13,7 +13,7 @@ cd "$folder_name"
     foamDictionary -entry endTime -set 1e-4 system/controlDict > log.foamDictionary_setEndTime 2>&1 && echo "PASS" || echo "FAIL"
 
     echo -n "setkN: "
-    foamDictionary -entry kN -set 1 caseParamsDict > log.foamDictionary_setkN 2>&1 && echo "PASS" || echo "FAIL"
+    setParameter kN 1 > log.setParameter_kN 2>&1 && echo "PASS" || echo "FAIL"
 
     echo -n "setNumberOfSubdomains: "
     foamDictionary -entry numberOfSubdomains -set 4 system/decomposeParDict > log.foamDictionary_setNumberOfSubdomains 2>&1 && echo "PASS" || echo "FAIL"
