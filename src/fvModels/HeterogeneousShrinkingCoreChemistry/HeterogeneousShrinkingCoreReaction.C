@@ -82,7 +82,7 @@ HeterogeneousShrinkingCoreReaction::HeterogeneousShrinkingCoreReaction
         IOobject
         (
             "SGR_" + name,
-            mesh.time().timeName(),
+            mesh.time().name(),
             mesh,
             IOobject::NO_READ,
             IOobject::NO_WRITE
@@ -95,7 +95,7 @@ HeterogeneousShrinkingCoreReaction::HeterogeneousShrinkingCoreReaction
         IOobject
         (
             "SSR_" + name,
-            mesh.time().timeName(),
+            mesh.time().name(),
             mesh,
             IOobject::NO_READ,
             IOobject::NO_WRITE
@@ -108,7 +108,7 @@ HeterogeneousShrinkingCoreReaction::HeterogeneousShrinkingCoreReaction
         IOobject
         (
             "SSP_" + name,
-            mesh.time().timeName(),
+            mesh.time().name(),
             mesh,
             IOobject::NO_READ,
             IOobject::NO_WRITE
@@ -121,7 +121,7 @@ HeterogeneousShrinkingCoreReaction::HeterogeneousShrinkingCoreReaction
         IOobject
         (
             "NRR_" + name,
-            mesh.time().timeName(),
+            mesh.time().name(),
             mesh,
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
@@ -135,7 +135,7 @@ HeterogeneousShrinkingCoreReaction::HeterogeneousShrinkingCoreReaction
         IOobject
         (
             "NRRAlphaCorr_" + name,
-            mesh.time().timeName(),
+            mesh.time().name(),
             mesh,
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
@@ -247,7 +247,7 @@ HeterogeneousShrinkingCoreReaction::HeterogeneousShrinkingCoreReaction
                 IOobject
                 (
                     "SGP_" + gasSpecies[scGPs_[i].index] + "_" + name,
-                    mesh.time().timeName(),
+                    mesh.time().name(),
                     mesh,
                     IOobject::NO_READ,
                     IOobject::NO_WRITE

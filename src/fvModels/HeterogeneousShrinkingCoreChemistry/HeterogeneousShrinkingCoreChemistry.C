@@ -96,7 +96,7 @@ Foam::fv::HeterogeneousShrinkingCoreChemistry
        IOobject
        (
            "conversion",
-           mesh.time().timeName(),
+           mesh.time().name(),
            mesh,
            IOobject::NO_READ,
            IOobject::AUTO_WRITE
@@ -227,7 +227,7 @@ Foam::fv::HeterogeneousShrinkingCoreChemistry
                     IOobject
                     (
                         "downscalingFactors_" + name,
-                        mesh.time().timeName(),
+                        mesh.time().name(),
                         mesh,
                         IOobject::NO_READ,
                         IOobject::NO_WRITE
