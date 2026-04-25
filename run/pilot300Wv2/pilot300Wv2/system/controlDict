@@ -16,7 +16,6 @@ FoamFile
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 libs (
-    "libInterstitialInletBCs.so"
     "libCLCFluidMulticomponentThermophysicalTransportModels.so"
 );
 

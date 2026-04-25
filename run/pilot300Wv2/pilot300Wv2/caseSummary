@@ -2,10 +2,10 @@
 
 time=0
 
-Min_AR=$(foamDictionary -entry boundaryField/inlet_AR/massFlow  -value -expand processor0/${time}/U.gas | tail -1)
-Min_FR=$(foamDictionary -entry boundaryField/inlet_FR/massFlow -value -expand processor0/${time}/U.gas | tail -1)
-Min_SL=$(foamDictionary -entry boundaryField/inlet_SL/massFlow -value -expand processor0/${time}/U.gas | tail -1)
-Min_DC2=$(foamDictionary -entry boundaryField/inlet_DC2/massFlow -value -expand processor0/${time}/U.gas | tail -1)
+Min_AR=$(foamDictionary -entry boundaryField/inlet_AR/massFlowRate  -value -expand processor0/${time}/U.gas | tail -1)
+Min_FR=$(foamDictionary -entry boundaryField/inlet_FR/massFlowRate -value -expand processor0/${time}/U.gas | tail -1)
+Min_SL=$(foamDictionary -entry boundaryField/inlet_SL/massFlowRate -value -expand processor0/${time}/U.gas | tail -1)
+Min_DC2=$(foamDictionary -entry boundaryField/inlet_DC2/massFlowRate -value -expand processor0/${time}/U.gas | tail -1)
 Min_DC=$(foamDictionary -entry massSource_DC/massFlowRate -value -expand constant/fvModels_massSource_DC | tail -1)
 
 # T=$(foamDictionary -entry params_T -value params)
