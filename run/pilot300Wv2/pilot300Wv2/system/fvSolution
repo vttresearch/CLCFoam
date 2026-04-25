@@ -23,8 +23,8 @@ solvers
         solver          PBiCGStab;
         preconditioner  DIC;
 		
-        nAlphaCorr      1;
-		nAlphaSubCycles constant 8;
+        nCorrectors     1;
+		nSubCycles      constant 8;
         implicitPhasePressure on;
 		
         dgdtLimit       1e-6;

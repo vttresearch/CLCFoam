@@ -24,8 +24,8 @@ solvers
         // preconditioner  DIC;
         // implicitPhasePressure on;
 		
-        nAlphaCorr      1;
-        nAlphaSubCycles constant 8;
+        nCorrectors     1;
+        nSubCycles      constant 8;
 		
         tolerance       1e-10;
         relTol          0;

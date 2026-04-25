@@ -20,8 +20,8 @@ solvers
 
     "alpha.*"
     {
-        nAlphaCorr      1;
-        nAlphaSubCycles constant 1;
+        nCorrectors     1;
+        nSubCycles      constant 1;
         implicitPhasePressure on;
 
         solver          smoothSolver;
@@ -31,9 +31,12 @@ solvers
         tolerance       1e-10;
         relTol          0;
         minIter         1;
-        extremaCoeff    1;
-				implicitPhasePressure on;
-        //extremaCoeff  0.001;
+
+        MULES
+        {
+            extremaCoeff 1;
+            //extremaCoeff  0.001;
+        }
     }
 
 
