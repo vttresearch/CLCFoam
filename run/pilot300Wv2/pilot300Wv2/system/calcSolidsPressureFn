@@ -21,6 +21,7 @@ resultName "p.solids";
 codeInclude
 #{
     #include "fvc.H"
+    #include "IOdictionary.H"
     #include "phaseModel.H"
     #include "momentumTransportModel.H"
     #include "radialModel.H"
@@ -82,10 +83,27 @@ codeRead
     phaseName_ = dict.lookup<word>("phase");
     resultName_ = dict.lookup<word>("resultName");
     
-    // idea from turbulenceIntensity.H
-    const momentumTransportModel& turbModel =
-            mesh().lookupType<momentumTransportModel>(phaseName_);
-    const dictionary& coeffDict = turbModel.coeffDict();
+    const IOdictionary momentumTransportDict
+    (
+        IOobject
+        (
+            IOobject::groupName("momentumTransport", phaseName_),
+            mesh().time().constant(),
+            mesh(),
+            IOobject::MUST_READ,
+            IOobject::NO_WRITE,
+            false
+        )
+    );
+    const word simulationType
+    (
+        momentumTransportDict.lookup<word>("simulationType")
+    );
+    const dictionary& simulationDict =
+        momentumTransportDict.subDict(simulationType);
+    const word modelName(simulationDict.lookup<word>("model"));
+    const word coeffDictName(modelName + "Coeffs");
+    const dictionary& coeffDict = simulationDict.subDict(coeffDictName);
 
     alphaMinFriction_ = dimensionedScalar
         (

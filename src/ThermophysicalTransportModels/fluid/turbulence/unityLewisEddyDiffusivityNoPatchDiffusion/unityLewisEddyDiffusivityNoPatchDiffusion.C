@@ -66,7 +66,6 @@ unityLewisEddyDiffusivityNoPatchDiffusion
         allowDefaultPrt
     )
 {
-    this->printCoeffs(typeName);
 }
 
 
@@ -128,10 +127,6 @@ unityLewisEddyDiffusivityNoPatchDiffusion
     //     momentumTransport.mesh()
     // )
 {
-    if (type == typeName)
-    {
-        this->printCoeffs(type);
-    }
     Info << "CONSTRUCTING!!!!!!!!!!!!!!!!!!" << endl;
 }
 
