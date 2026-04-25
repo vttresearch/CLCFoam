@@ -25,7 +25,7 @@ solvers
         // implicitPhasePressure on;
 		
         nAlphaCorr      1;
-        nAlphaSubCycles 8;
+        nAlphaSubCycles constant 8;
 		
         tolerance       1e-10;
         relTol          0;
