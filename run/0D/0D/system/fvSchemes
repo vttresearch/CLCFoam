@@ -95,7 +95,10 @@ laplacianSchemes
     laplacian((alpha.gas*DEff),CH4.gas)         Gauss linear limited 0.5;
     laplacian((alpha.gas*DEff),Ar.gas)         Gauss linear limited 0.5;
     laplacian((rho.solids*(nut.solids+kineticTheory:nuFric.solids)),U.solids)   Gauss linear limited 0.5;
+    laplacian(interpolate((rho.solids*(nut.solids+kineticTheory:nuFric.solids))),U.solids) Gauss linear limited 0.5;
+    laplacian(interpolate(((alpha.solids*rho.solids)*(nut.solids+kineticTheory:nuFric.solids))),U.solids) Gauss linear limited 0.5;
     laplacian(((alpha.gas*rho.gas)*nuEff.gas),U.gas)    Gauss linear limited 0.5;
+    laplacian(interpolate(((alpha.gas*rho.gas)*nuEff.gas)),U.gas) Gauss linear limited 0.5;
     laplacian((alpha.gas*alphahe),e.gas)        Gauss linear limited 0.5;
     laplacian(rAUf,p_rgh)                       Gauss linear limited 0.5;
     laplacian(kappa,Theta)                      Gauss linear limited 0.5;
@@ -119,6 +122,9 @@ interpolationSchemes
     interpolate(alpha.gas)                      linear;
     interpolate(rho.solids)                     linear;
     interpolate(rho.gas)                        linear;
+    interpolate((rho.solids*(nut.solids+kineticTheory:nuFric.solids))) linear;
+    interpolate(((alpha.solids*rho.solids)*(nut.solids+kineticTheory:nuFric.solids))) linear;
+    interpolate(((rho.solids*kineticTheory:lambda.solids)*div(phi.solids))) linear;
     interpolate((max(alpha.solids,residualAlpha)*rAU.solids))   linear;
     interpolate((max(alpha.gas,residualAlpha)*rAU.gas))         linear;
     interpolate((rAU.solids*pPrime.solids))     linear;
@@ -144,6 +150,7 @@ interpolationSchemes
     interpolate(pPrime.solids)                  linear;
     interpolate(rA.solids)                      linear;
     interpolate(rA.gas)                         linear;
+    interpolate(((alpha.gas*rho.gas)*nuEff.gas)) linear;
 
     flux((-((alpha.gas*rho.gas)*nuEff.gas)*dev2(T(grad(U.gas))))) linear;
 
@@ -151,6 +158,8 @@ interpolationSchemes
     interpolate((A(U.gas)+((max((residualAlpha-alpha.gas),0)*rho.gas)|deltaT)))             linear;
     interpolate(max(alpha.solids,residualAlpha))                    linear;
     interpolate(max(alpha.gas,residualAlpha))                       linear;
+    dotInterpolate(Sf,dev2(T(grad(U.solids))))                      linear;
+    dotInterpolate(Sf,dev2(T(grad(U.gas))))                         linear;
     dotInterpolate(Sf,((alpha.solids_0*rho.solids_0)*U.solids_0))   linear;
     interpolate((alpha.solids_0*rho.solids_0))                      linear;
     dotInterpolate(Sf,U.solids_0)                                   linear;
