@@ -17,7 +17,9 @@ FoamFile
 
 dimensions      [ 0 0 0 0 0 0 0 ];
 
+INPUT_getCorrespondingMassFraction_fieldName __FIELD_NAME__;
 #include "$FOAM_CASE/../../../src/common/getCorrespondingMassFraction"
+#remove INPUT_getCorrespondingMassFraction_fieldName
 internalField  uniform $OUTPUT_getCorrespondingMassFraction;
 #remove OUTPUT_getCorrespondingMassFraction
 

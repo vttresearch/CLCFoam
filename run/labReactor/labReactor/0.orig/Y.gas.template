@@ -15,7 +15,9 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+INPUT_getCorrespondingMassFraction_fieldName __FIELD_NAME__;
 #include "$FOAM_CASE/../../../src/common/getCorrespondingMassFraction" // [-] - Mass fraction of the specie FoamFile/object
+#remove INPUT_getCorrespondingMassFraction_fieldName
 
 dimensions      [ 0 0 0 0 0 0 0 ];
 

@@ -31,7 +31,7 @@ OUTPUT_getMassFraction #codeStream   // Output
             YListName += "_" + dict.lookup<word>("INPUT_getMassFraction_postfix");
         }
 
-        List<scalar> Ys = dict.lookupScoped<List<scalar>>("../caseDict!" + YListName, true, false);
+        List<scalar> Ys = dict.lookupScoped<List<scalar>>(getEnv("FOAM_CASE") + "/caseDict!" + YListName, true, false);
 
         const wordList& species = dict.lookupScoped<wordList>(getEnv("FOAM_CASE") + "/constant/physicalProperties." + phase + "!species", true, false);
 

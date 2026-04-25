@@ -36,6 +36,7 @@ setICBC () {
                 species=( ${species:1:-1} ) # alternative way to convert OF list to array
                 for sp in "${species[@]}"; do
                     cp 0/Y.$phase.template 0/$sp.$phase
+                    sed -i "s/__FIELD_NAME__/$sp.$phase/g" 0/$sp.$phase
                     foamDictionary -entry FoamFile/object 0/$sp.$phase -set "$sp.$phase" >/dev/null 2>&1
                 done
             else

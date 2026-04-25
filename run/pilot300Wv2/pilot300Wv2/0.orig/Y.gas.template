@@ -18,7 +18,9 @@ FoamFile
 dimensions      [ 0 0 0 0 0 0 0 ];
 
 INPUT_getCorrespondingMassFraction_postfix AR;
+    INPUT_getCorrespondingMassFraction_fieldName __FIELD_NAME__;
     #include "$FOAM_CASE/../../../src/common/getCorrespondingMassFraction"
+    #remove INPUT_getCorrespondingMassFraction_fieldName
     internalField  uniform $OUTPUT_getCorrespondingMassFraction;
     #remove OUTPUT_getCorrespondingMassFraction
 #remove INPUT_getCorrespondingMassFraction_postfix
@@ -29,7 +31,9 @@ boundaryField
     {   
         type    fixedValue;
         INPUT_getCorrespondingMassFraction_postfix FR;
+            INPUT_getCorrespondingMassFraction_fieldName __FIELD_NAME__;
             #include "$FOAM_CASE/../../../src/common/getCorrespondingMassFraction"
+            #remove INPUT_getCorrespondingMassFraction_fieldName
             value  uniform $OUTPUT_getCorrespondingMassFraction;
             #remove OUTPUT_getCorrespondingMassFraction
         #remove INPUT_getCorrespondingMassFraction_postfix
@@ -38,7 +42,9 @@ boundaryField
     {
         type    fixedValue;
         INPUT_getCorrespondingMassFraction_postfix AR;
+            INPUT_getCorrespondingMassFraction_fieldName __FIELD_NAME__;
             #include "$FOAM_CASE/../../../src/common/getCorrespondingMassFraction"
+            #remove INPUT_getCorrespondingMassFraction_fieldName
             value  uniform $OUTPUT_getCorrespondingMassFraction;
             #remove OUTPUT_getCorrespondingMassFraction
         #remove INPUT_getCorrespondingMassFraction_postfix
@@ -47,7 +53,9 @@ boundaryField
     {
         type    fixedValue;
         INPUT_getCorrespondingMassFraction_postfix SL;
+            INPUT_getCorrespondingMassFraction_fieldName __FIELD_NAME__;
             #include "$FOAM_CASE/../../../src/common/getCorrespondingMassFraction"
+            #remove INPUT_getCorrespondingMassFraction_fieldName
             value  uniform $OUTPUT_getCorrespondingMassFraction;
             #remove OUTPUT_getCorrespondingMassFraction
         #remove INPUT_getCorrespondingMassFraction_postfix
@@ -56,7 +64,9 @@ boundaryField
     {
         type    fixedValue;
         INPUT_getCorrespondingMassFraction_postfix DC2;
+            INPUT_getCorrespondingMassFraction_fieldName __FIELD_NAME__;
             #include "$FOAM_CASE/../../../src/common/getCorrespondingMassFraction"
+            #remove INPUT_getCorrespondingMassFraction_fieldName
             value  uniform $OUTPUT_getCorrespondingMassFraction;
             #remove OUTPUT_getCorrespondingMassFraction
         #remove INPUT_getCorrespondingMassFraction_postfix
@@ -81,7 +91,9 @@ sources
     {
         type            uniformFixedValue;
         INPUT_getCorrespondingMassFraction_postfix DC1;
+            INPUT_getCorrespondingMassFraction_fieldName __FIELD_NAME__;
             #include "$FOAM_CASE/../../../src/common/getCorrespondingMassFraction" // [-] - Mass fraction of the specie FoamFile/object
+            #remove INPUT_getCorrespondingMassFraction_fieldName
             uniformValue    $OUTPUT_getCorrespondingMassFraction;
             #remove OUTPUT_getCorrespondingMassFraction
         #remove INPUT_getCorrespondingMassFraction_postfix

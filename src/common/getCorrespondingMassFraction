@@ -20,7 +20,12 @@ OUTPUT_getCorrespondingMassFraction #codeStream   // Output
 
     code
     #{
-        const word& field_name = dict.topDict().dictName();
+        word field_name(dict.topDict().dictName());
+        if (dict.found("INPUT_getCorrespondingMassFraction_fieldName")) {
+            field_name = dict.lookup<word>("INPUT_getCorrespondingMassFraction_fieldName");
+        } else if (dict.topDict().found("FoamFile")) {
+            field_name = dict.topDict().subDict("FoamFile").lookup<word>("object");
+        }
         const word specie = IOobject::member(field_name);
         const word phase = IOobject::group(field_name);
 
@@ -29,7 +34,7 @@ OUTPUT_getCorrespondingMassFraction #codeStream   // Output
             YListName += "_" + dict.lookup<word>("INPUT_getCorrespondingMassFraction_postfix");
         }
 
-        List<scalar> Ys = dict.lookupScoped<List<scalar>>("../caseDict!" + YListName, true, false);
+        List<scalar> Ys = dict.lookupScoped<List<scalar>>(getEnv("FOAM_CASE") + "/caseDict!" + YListName, true, false);
 
         const wordList& species = dict.lookupScoped<wordList>(getEnv("FOAM_CASE") + "/constant/physicalProperties." + phase + "!species", true, false);
 
