@@ -123,6 +123,26 @@ FoamFile
 // Cell phase density [kg/m^3]
 #includeFunc multiply(executeControl=timeStep,executeInterval=1,writeControl=none,fields=(alpha.gas rho.gas))
 #includeFunc multiply(executeControl=timeStep,executeInterval=1,writeControl=none,fields=(alpha.solids rho.solids))
+alphaRhoUGas
+{
+    type            multiply;
+    libs            ("libfieldFunctionObjects.so");
+    fields          (alpha.gas rho.gas U.gas);
+    result          alphaRhoU.gas;
+    executeControl  timeStep;
+    executeInterval 1;
+    writeControl    none;
+}
+alphaRhoUSolids
+{
+    type            multiply;
+    libs            ("libfieldFunctionObjects.so");
+    fields          (alpha.solids rho.solids U.solids);
+    result          alphaRhoU.solids;
+    executeControl  timeStep;
+    executeInterval 1;
+    writeControl    none;
+}
 // Divergence of stress tensor [kg/m^2/s^2]
 #includeFunc calcDivDevTauFn(executeControl=timeStep,executeInterval=1,phase=gas)
 #includeFunc calcDivDevTauFn(executeControl=timeStep,executeInterval=1,phase=solids)
@@ -144,10 +164,41 @@ FoamFile
     multiply(alpha.gas,rho.gas)
     multiply(alpha.solids,rho.solids)
     ))
-// Favre-averaged gas velocity (mean and prime2mean) [kg/s/m^2]
-#includeFunc weightedAverageGasFn
-// Favre-averaged solids velocity (mean and prime2mean) [kg/s/m^2]
-#includeFunc weightedAverageSolidsFn
+favreVelocityAverage
+{
+    type            fieldAverage;
+    libs            ("libfieldFunctionObjects.so");
+    writeControl    writeTime;
+    fields
+    (
+        alphaRhoU.gas
+        {
+            mean    yes;
+        }
+        alphaRhoU.solids
+        {
+            mean    yes;
+        }
+    );
+}
+favreVelocityGas
+{
+    type            divide;
+    libs            ("libfieldFunctionObjects.so");
+    fields          (alphaRhoU.gasMean multiply(alpha.gas,rho.gas)Mean);
+    result          U.gasMean_favre;
+    executeControl  writeTime;
+    writeControl    writeTime;
+}
+favreVelocitySolids
+{
+    type            divide;
+    libs            ("libfieldFunctionObjects.so");
+    fields          (alphaRhoU.solidsMean multiply(alpha.solids,rho.solids)Mean);
+    result          U.solidsMean_favre;
+    executeControl  writeTime;
+    writeControl    writeTime;
+}
 // Averaged volume fractions [-]
 #includeFunc fieldAverage(fields=(alpha.gas alpha.solids))
 // Averaged pressure [Pa]
