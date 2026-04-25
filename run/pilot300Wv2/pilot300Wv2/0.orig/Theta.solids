@@ -31,8 +31,8 @@ boundaryField
     wall
     {
         type            JohnsonJacksonParticleTheta;
-        restitutionCoefficient restitutionCoefficient [0 0 0 0 0 0 0] 0.9;
-        specularityCoefficient specularityCoefficient [0 0 0 0 0 0 0] 0.01;
+        restitutionCoefficient 0.9;
+        specularityCoefficient 0.01;
         value           uniform 1e-05;
     }
 }

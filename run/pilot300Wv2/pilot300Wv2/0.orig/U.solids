@@ -23,7 +23,7 @@ boundaryField
     wall
     {
         type            JohnsonJacksonParticleSlip;
-        specularityCoefficient specularityCoefficient [0 0 0 0 0 0 0] 0.01;
+        specularityCoefficient 0.01;
         value           uniform (0 0 0);
     }
     "inlet.*"
