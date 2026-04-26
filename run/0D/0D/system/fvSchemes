@@ -118,6 +118,7 @@ laplacianSchemes
 
 interpolationSchemes
 {
+    default                                     linear;
     flux(U.solids)                              linear;
     flux(U.gas)                                 linear;
     interpolate(alpha.solids)                   linear;

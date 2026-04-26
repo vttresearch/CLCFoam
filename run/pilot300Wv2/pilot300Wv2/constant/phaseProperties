@@ -15,8 +15,6 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-type basicMultiphaseSystem;
-
 phases (solids gas);
 
 referencePhase gas;
@@ -60,59 +58,13 @@ blending
 }
 
 interfaceCompression
-();
+{}
 
 surfaceTension
-(
-
-);
+{}
 
 aspectRatio
-();
-
-drag
-(
-
-    (solids in gas)
-    {
-        type            GidaspowErgunWenYu;//GidaspowSmooth;
-        residualAlpha   1e-5;
-        residualRe      1e-5;
-        swarmCorrection
-        {
-            type        none;
-        }
-    }
-);
-
-virtualMass
-(
-
-
-);
-
-heatTransfer
-(
-    (solids in gas)
-    {
-
-        type            Gunn;
-        residualAlpha   1e-4;
-
-    }
-);
-
-phaseTransfer
-();
-
-lift
-();
-
-wallLubrication
-();
-
-turbulentDispersion
-();
+{}
 
 // Minimum allowable pressure
 pMin            10000;

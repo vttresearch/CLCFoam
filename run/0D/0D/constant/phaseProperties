@@ -15,8 +15,6 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-type basicMultiphaseSystem;
-
 phases (solids gas);
 
 referencePhase gas;
@@ -50,25 +48,10 @@ blending
     }
 }
 
-interfaceCompression ();
-surfaceTension ();
-aspectRatio ();
-drag ();
-virtualMass ();
+interfaceCompression {}
+surfaceTension {}
+aspectRatio {}
 
-heatTransfer
-(
-    (solids in gas)
-    {
-        type            Gunn;
-        residualAlpha   1e-10;
-    }
-);
-
-phaseTransfer {}
-lift ();
-wallLubrication ();
-turbulentDispersion ();
 
 
 // ************************************************************************* //

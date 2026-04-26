@@ -5,14 +5,14 @@ blockMesh
 decomposePar
 NPROCS=$(foamDictionary -entry numberOfSubdomains -value system/decomposeParDict | tail -n 1)
 kN=$(foamDictionary -expand -entry kN -value caseParamsDict | tail -n 1)
-mpirun -np $NPROCS snappyHexMesh -parallel -overwrite | tee log.snappyHexMesh
+mpirun -np $NPROCS snappyHexMesh -parallel | tee log.snappyHexMesh
 reconstructPar
 rm -r processor*
 # topoSet | tee log.topoSet0
 checkMesh -allTopology | tee log.checkMesh
 
 # createPatch -overwrite
-renumberMesh -overwrite
+renumberMesh
 topoSet -dict "system/topoSetDict_kN${kN}" | tee log.topoSet
 
 N_CV_SL=$(sed -n 's/.*cellSet controlVolume_SL now size \([0-9]\+\)/\1/p' log.topoSet | head -n 1)
