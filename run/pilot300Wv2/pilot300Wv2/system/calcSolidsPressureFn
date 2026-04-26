@@ -32,7 +32,6 @@ codeInclude
 codeOptions
 #{
     -I$(FOAM_MODULES)/multiphaseEuler/phaseSystem/lnInclude \
-    -I$(FOAM_MODULES)/multiphaseEuler/interfacialModels/lnInclude \
     -I$(FOAM_MODULES)/multiphaseEuler/populationBalance/lnInclude \
     -I$(FOAM_MODULES)/multiphaseEuler/momentumTransportModels/lnInclude \
     -I$(FOAM_MODULES)/multiphaseEuler/thermophysicalTransportModels/lnInclude \
