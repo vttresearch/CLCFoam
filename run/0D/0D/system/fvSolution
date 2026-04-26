@@ -45,7 +45,10 @@ solvers
     {
         solver          GAMG;
         smoother        DIC;
-        processorAgglomerator procFaces;
+        processorAgglomeration
+        {
+            agglomerator pair;
+        }
         nAgglomeratingCells 400;
 
         tolerance       1e-8;
@@ -141,7 +144,10 @@ solvers
     {
         solver                GAMG;
         smoother              symGaussSeidel;
-        processorAgglomerator procFaces;
+        processorAgglomeration
+        {
+            agglomerator       pair;
+        }
         nAgglomeratingCells   400;
 
         tolerance             1e-10;

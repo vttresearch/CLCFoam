@@ -69,7 +69,7 @@ rho_syngas_diluted_with_H2O 0.61348;
 
 // ------------=== Derived parameters ===-------------
 
-#ifeq $simulationType leakage // [Table 13.1, p.13, Moldenhauer's thesis]
+#ifeq ($simulationType leakage) // [Table 13.1, p.13, Moldenhauer's thesis]
     chemistry disable; // disabling chemistry
 
     // [Ln/min]
@@ -92,7 +92,7 @@ rho_syngas_diluted_with_H2O 0.61348;
     rho_DC1 $rho_CO2;
     rho_DC2 $rho_CO2;
 #endif
-#ifeq $simulationType fresh // [Table 13.6, p.23, Moldenhauer's thesis]
+#ifeq ($simulationType fresh) // [Table 13.6, p.23, Moldenhauer's thesis]
     // [Ln/min]
     inlet_FR  1.7;
     inlet_AR  7.2;
@@ -114,11 +114,11 @@ rho_syngas_diluted_with_H2O 0.61348;
     rho_DC2 $rho_Ar;
 #endif
 
-#ifeq $chemistry pre
+#ifeq ($chemistry pre)
     // rhoOxidized         4100;       // [kg/m^3] - density of fully oxidized state
     Ro                  0.04;       // [-]    - oxygen carrying capacity
 #endif
-#ifeq $chemistry act
+#ifeq ($chemistry act)
     // rhoOxidized         4250;       // [kg/m^3] - density of fully oxidized state
     Ro                  0.033;      // [-]    - oxygen carrying capacity
 #endif

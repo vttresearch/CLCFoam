@@ -18,11 +18,11 @@ FoamFile
 chemistry   ${${FOAM_CASE}/caseParamsDict!chemistry};
 VM          ${${FOAM_CASE}/caseDict!VM_NTP};
 
-#ifeq $chemistry pre
+#ifeq ($chemistry pre)
     #include "$FOAM_CASE/../../../etc/caseDicts/fvModels_pre"
 #endif
 
-#ifeq $chemistry act
+#ifeq ($chemistry act)
     #include "$FOAM_CASE/../../../etc/caseDicts/fvModels_act"
 #endif
 

@@ -1,5 +1,5 @@
 # CLCFoam
-![OpenFOAM 20250903](https://img.shields.io/badge/OpenFOAM-20250903-brightgreen)
+![OpenFOAM 20251208](https://img.shields.io/badge/OpenFOAM-20251208-brightgreen)
 
 This repository contains materials for the article by Morev et al. [[1]](#1) on the coupling between heterogeneous chemistry and Eulerian-Eulerian multiphase model. The implementation is verified and validated using chemical-looping combustion (CLC) experimental data from literature.
 

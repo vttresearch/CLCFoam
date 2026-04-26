@@ -53,35 +53,35 @@ rhoOxidized         3000;       // [kg/m^3] - density of fully oxidized state (b
 // Taken from any surfaceFieldValue output in postProcessing folder
 // Or with paraview's IntegrateVariables->CellData filter
 // This is used only to estimate initial velocities in the internal field
-#ifeq $kN 1
+#ifeq ($kN 1)
     ICvol   1.43634930438e-05;
     Ainlet  3.629999999999e-04;
 #endif
-#ifeq $kN 2
+#ifeq ($kN 2)
     ICvol   1.50131873187e-05;
     Ainlet  3.758052534888e-04;
 #endif
-#ifeq $kN 3
+#ifeq ($kN 3)
     ICvol   1.51560968432e-05;
     Ainlet  3.782057309585e-04;
 #endif
-#ifeq $kN 4
+#ifeq ($kN 4)
     ICvol   1.52132299189e-05;
     Ainlet  3.782057309585e-04;
 #endif
 
-#ifeq $chemistry pre
+#ifeq ($chemistry pre)
     Ro              0.04;       // [-]    - oxygen carrying capacity
 #endif
-#ifeq $chemistry act
+#ifeq ($chemistry act)
     Ro              0.033;      // [-]    - oxygen carrying capacity
 #endif
 
-#ifeq $gas O2
+#ifeq ($gas O2)
     initialConversion   0.0;
     defaultSpecie       N2;
 #endif
-#ifeq $gas CO
+#ifeq ($gas CO)
     defaultSpecie       CO2;
 #endif
 

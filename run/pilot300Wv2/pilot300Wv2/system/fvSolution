@@ -116,7 +116,10 @@ solvers
     {
         solver                GAMG;
         smoother              symGaussSeidel;
-        processorAgglomerator procFaces;
+        processorAgglomeration
+        {
+            agglomerator       pair;
+        }
         nAgglomeratingCells   400;
 
         tolerance             1e-10;

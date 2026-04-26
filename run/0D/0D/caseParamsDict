@@ -33,16 +33,16 @@ p                   101325;     // [Pa] - pressure
 
 // ------------=== Calculations with no external dependensies ===-------------
 
-#ifeq $chemistry pre
+#ifeq ($chemistry pre)
     rhoOxidized         4100;       // [kg/m^3] - density of fully oxidized state
     Ro                  0.04;       // [-]    - oxygen carrying capacity
 #endif
-#ifeq $chemistry act
+#ifeq ($chemistry act)
     rhoOxidized         4250;       // [kg/m^3] - density of fully oxidized state
     Ro                  0.033;      // [-]    - oxygen carrying capacity
 #endif
 
-#ifeq $gas O2
+#ifeq ($gas O2)
     initialConversion 0.0;
 #endif
 
