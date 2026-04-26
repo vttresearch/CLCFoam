@@ -45,7 +45,7 @@ alphaSolids #codeStream
         const IOdictionary& d = static_cast<const IOdictionary&>(dict);
         const fvMesh& mesh = refCast<const fvMesh>(d.db());
         const word setName = $<word>setName;
-        const cellSet myset(mesh(), setName, IOobject::MUST_READ);
+        const cellSet myset(mesh, setName, IOobject::MUST_READ);
         scalar setVolume = 0;
 
         forAllConstIter(labelHashSet, myset, iter) {
@@ -63,24 +63,29 @@ alphaSolids #codeStream
     #};
 };
 
-defaultFieldValues
-(
+defaultValues
+{
 
-    volScalarFieldValue alpha.solids 0.0
-    volScalarFieldValue alpha.gas 1.0
+    alpha.solids 0.0;
+    alpha.gas 1.0;
 
-);
+}
 
-regions
-(
-    zoneToCell {
-        zone $setName;
-        fieldValues (
-            volScalarFieldValue alpha.solids $alphaSolids
-            volScalarFieldValue alpha.gas #calc "1.0-$alphaSolids"
-        );
+zones
+{
+    solidsLoading
+    {
+        type        set;
+        zoneType    cell;
+        setName     $setName;
+
+        values
+        {
+            alpha.solids $alphaSolids;
+            alpha.gas    #calc "1.0-$alphaSolids";
+        }
     }
-);
+}
 
 
 // ************************************************************************* //

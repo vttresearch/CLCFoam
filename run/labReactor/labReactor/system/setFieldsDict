@@ -58,21 +58,26 @@ rho     ${${FOAM_CASE}/caseDict!rho_solids};  // [kg/m^3] - density of solids //
 //     #};
 // };
 
-defaultFieldValues
-(
-    volScalarFieldValue alpha.solids 0.0
-);
+defaultValues
+{
+    alpha.solids 0.0;
+}
 
-regions
-(
-    boxToCell {
-        box ( -0.012 -0.000001 -0.012  ) ( 0.012 0.040001 0.012 ) ;
-        fieldValues (
-            volScalarFieldValue alpha.solids #calc " $m / $ICvol / $rho "
-            volScalarFieldValue alpha.gas #calc " 1 - ( $m / $ICvol / $rho ) "
-        );
+zones
+{
+    initialSolids
+    {
+        type        box;
+
+        box         ( -0.012 -0.000001 -0.012 ) ( 0.012 0.040001 0.012 );
+
+        values
+        {
+            alpha.solids #calc " $m / $ICvol / $rho ";
+            alpha.gas    #calc " 1 - ( $m / $ICvol / $rho ) ";
+        }
     }
-);
+}
 
 
 // ************************************************************************* //
