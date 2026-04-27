@@ -318,7 +318,7 @@ unityLewisEddyDiffusivityNoPatchDiffusion<TurbulenceThermophysicalTransportModel
     volScalarField::Boundary& dEffBf = dEff.ref().boundaryFieldRef();
     forAll(patches, patchi)
     {
-        Info << "    divj:Patch " << patches[patchi].patch().name() << " of type " << patches[patchi].patch().type() << endl;
+        Info << "    divj:Patch " << patches[patchi].name() << " of type " << patches[patchi].type() << endl;
         if (dEffBf[patchi].coupled())
         {
             continue;
