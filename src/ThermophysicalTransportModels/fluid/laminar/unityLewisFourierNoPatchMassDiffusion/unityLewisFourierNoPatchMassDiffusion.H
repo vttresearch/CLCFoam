@@ -108,6 +108,30 @@ public:
         //- Read thermophysicalTransport dictionary
         virtual bool read();
 
+        //- Mass diffusivity
+        //  for a given specie mass-fraction [kg/m/s]
+        virtual tmp<volScalarField> D(const volScalarField& Yi) const
+        {
+            return volScalarField::New
+            (
+                "D",
+                this->thermo().kappa()/this->thermo().Cp()
+            );
+        }
+
+        //- Mass diffusivity
+        //  for a given specie mass-fraction for patch [kg/m/s]
+        virtual tmp<scalarField> D
+        (
+            const volScalarField& Yi,
+            const label patchi
+        ) const
+        {
+            return
+                this->thermo().kappa().boundaryField()[patchi]
+               /this->thermo().Cp().boundaryField()[patchi];
+        }
+
         //- Effective mass diffusion coefficient
         //  for a given specie mass-fraction [kg/m/s]
         virtual tmp<volScalarField> DEff(const volScalarField& Yi) const
